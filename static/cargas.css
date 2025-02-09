@@ -1,0 +1,24 @@
+
+main .analyse .progress-container,
+main .analyse .progress,
+main .analyse .activaciones {
+    width: 92px;
+    height: 92px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    position: relative;
+}
+
+main .analyse .progress,
+main .analyse .activaciones {
+    background: conic-gradient(from 0deg at 50% 50%, #6f7bf7 0%, #9bf8f4 50%, #101012 50%);
+}
+
+main .analyse .progress-container,
+main .analyse .progress,
+main .analyse .activaciones {
+    width: 72px;
+    height: 72px;
+}

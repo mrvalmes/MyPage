@@ -1,0 +1,28 @@
+[
+    {
+        "email": "henry@heromovil",
+        "password": "h12345",
+        "type": 1
+    },
+    {
+        "email": "thomas@heromovil",
+        "password": "12345",
+        "type": 1
+    },
+    {
+        "email": "aferreira@heromovil",
+        "password": "12345",
+        "type": 2
+    },
+    {
+        "email": "akatz@heromovil",
+        "password": "12345",
+        "type": 2
+    }
+    ,
+    {
+        "email": "ventas@heromovil",
+        "password": "12345",
+        "type": 3
+    }
+]

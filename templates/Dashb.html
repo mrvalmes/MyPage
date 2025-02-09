@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="images/logo.png">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cargas.css">
+    <title>Heromovil</title>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="#" class="logo">
+            <i class='bx bx-store-alt'></i>
+            <div class="logo-name"><span>Hero</span>Movil</div>
+        </a>
+        <ul class="side-menu">
+            <li><a href="Home.html"><i class='bx bxs-dashboard'></i>Dashboard</a></li>
+            <li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
+            <li class="active"><a href="Dashb.html"><i class='bx bx-analyse'></i>Analiticas</a></li>
+            <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
+            <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
+            <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="#" class="logout">
+                    <i class='bx bx-log-out-circle'></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Navbar -->
+        <nav>
+            <i class='bx bx-menu'></i>
+            <form action="#">
+                <div class="form-input">
+                    <input type="search" placeholder="Search...">
+                    <button class="search-btn" type="submit"><i class='bx bx-search'></i></button>
+                </div>
+            </form>
+            <input type="checkbox" id="theme-toggle" hidden>
+            <label for="theme-toggle" class="theme-toggle"></label>
+            <a href="#" class="notif">
+                <i class='bx bx-bell'></i>
+                <span class="count">12</span>
+            </a>
+            <a href="#" class="profile">
+                <img src="images/logo.png">
+            </a>
+        </nav>
+        <!-- End of Navbar -->
+        
+        <!--Info-->
+        <main>
+            <div class="header">
+                <div class="left">
+                    <h1>Dashboard</h1>
+                    <ul class="breadcrumb">
+                        <li><a href="#">
+                                Analiticas
+                            </a></li>
+                        /
+                        <li><a href="#" class="active">Ventas</a></li>
+                    </ul>
+                </div>
+                <a href="#" class="report">
+                    <i class='bx bx-cloud-download'></i>
+                    <span>Download CSV</span>
+                </a>
+            </div>
+            <!-- End of info -->
+
+            <!--Selector-->
+            <div class="bottom-data">
+                <div class="orders" id="obj-rest">
+                    <div class="test-aling">
+                        <h1>Resultados: </h1>
+                        <div class="select">
+                            <select name="opciones" id="opciones">
+                                <option selected disabled>Selecciona Empleado</option>
+                                <option value="opcion1">Erika Vargas</option>
+                                <option value="opcion2">Maria Delgado</option>
+                                <option value="opcion3">Santa Silva</option>
+                                <option value="opcion4">Lishmery Adames</option>
+                                <option value="opcion5">Jose Manuel</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Fin selector-->
+
+            <!-- Tarjetas -->
+            <ul class="insights">
+                <li>
+                    <i class='bx bx-calendar-check'></i>
+                    <span class="info">
+                        <h3>
+                            25
+                        </h3>
+                        <p>PAV</p>
+                    </span>
+                </li>
+                <li><i class='bx bx-show-alt'></i>
+                    <span class="info">
+                        <h3>
+                            500
+                        </h3>
+                        <p>Clientes Atendidos</p>
+                    </span>
+                </li>
+                <li><i class='bx bx-line-chart'></i>
+                    <span class="info">
+                        <h3>
+                            5%
+                        </h3>
+                        <p>Conversion</p>
+                    </span>
+                </li>
+                <li><i class='bx bx-dollar-circle'></i>
+                    <span class="info">
+                        <h3>
+                            $1,035
+                        </h3>
+                        <p>Comision</p>
+                    </span>
+                </li>
+            </ul>
+            <!--Fin tarjetas -->
+            
+            <!--Detalle Ventas-->
+            <div class="bottom-data">
+                <div class="orders" id="obj-rest">
+                    <h2>Obetivos / Resultados</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>
+                                    <h4>Producto</h4>
+                                </th>
+                                <th>
+                                    <h4>Objetivo</h4>
+                                </th>
+                                <th>
+                                    <h4>Resultado</h4>
+                                </th>
+                                <th>
+                                    <h4>Logro</h4>
+                                </th>
+                                <th>
+                                    <h4>Proyeccion</h4>
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <!--Detalle Ventas Fin-->
+
+            <!-- Datos Generales -->
+            <div class="bottom-data">
+                <div class="orders">                
+                    <!--Chart lieal inicio-->
+                    <section id="main-chart" class="recent-orders"> 
+                        <h2>Linea de tiempo</h2>                        
+                        <header>
+                            <div class="wrapper-reach">
+                                <div class="wrapper-filter">
+                                    <div class="filters">
+                                        <div class="filter selected" data-label="Todos">
+                                            <p>Todo</p>
+                                        </div>
+                                        <div class="filter" data-label="Flex">
+                                            <p>Flex</p>
+                                        </div>
+                                        <div class="filter" data-label="Internet">
+                                            <p>Internet</p>
+                                        </div>
+                                        <div class="filter" data-label="Fijos">
+                                            <p>Fijos</p>
+                                        </div>
+                                        <div class="filter" data-label="Migra">
+                                            <p>Migra</p>
+                                        </div>
+                                        <div class="filter" data-label="Fide Pos">
+                                            <p>Fide Pos</p>
+                                        </div>
+                                        <div class="filter" data-label="Fide Up">
+                                            <p>Fide Up</p>
+                                        </div>
+                                        <div class="filter" data-label="Reemp Pos">
+                                            <p>Reemp Pos</p>
+                                        </div>
+                                        <div class="filter" data-label="Reemp Up">
+                                            <p>Reemp Up</p>
+                                        </div>
+                                        <div class="filter" data-label="Fide/Reemp Net Up">
+                                            <p>Fide/Reemp Net+Up</p>
+                                        </div>
+                                        <div class="filter" data-label="Aumentos">
+                                            <p>Aumentos</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+                        <div class="chart">
+                            <canvas id="chartMain" width="700" height="200"></canvas>
+                        </div>
+                    </section>
+                    <!--Chart lieal inicio-->
+                </div>
+            </div>
+        </main>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/home.js"></script>    
+</body>
+</html>
