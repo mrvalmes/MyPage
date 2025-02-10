@@ -3,12 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="images/logo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/cargas.css">
-    <title>Heromovil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cargas.css') }}">
+    <title>Heromovil | HenryValmes</title>
 </head>
 
 <body>
@@ -20,9 +21,9 @@
             <div class="logo-name"><span>Hero</span>Movil</div>
         </a>
         <ul class="side-menu">
-            <li><a href="Home.html"><i class='bx bxs-dashboard'></i>Dashboard</a></li>
+            <li><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>
             <li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
-            <li class="active"><a href="Dashb.html"><i class='bx bx-analyse'></i>Analiticas</a></li>
+            <li class="active"><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
             <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
             <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
             <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>
@@ -56,7 +57,7 @@
                 <span class="count">12</span>
             </a>
             <a href="#" class="profile">
-                <img src="images/logo.png">
+                <img src="/static/images/logo.png">
             </a>
         </nav>
         <!-- End of Navbar -->
@@ -226,10 +227,8 @@
             </div>
         </main>
 
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/home.js"></script>    
+    </div>      
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>
 </html>

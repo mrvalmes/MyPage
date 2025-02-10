@@ -3,11 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="images/logo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="css/style.css">
-    <title>Responsive Dashboard Design #2 | AsmrProg</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">        
+    <title>Heromovil | HenryValmes</title>
 </head>
 
 <body>
@@ -19,9 +18,9 @@
             <div class="logo-name"><span>Hero</span>Movil</div>
         </a>
         <ul class="side-menu">
-            <li class="active"><a href="Home.html"><i class='bx bxs-dashboard'></i>Inicio</a></li>            
+            <li class="active"><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>            
             <li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
-            <li><a href="Dashb.html"><i class='bx bx-analyse'></i>Analiticas</a></li>
+            <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
             <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
             <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
             <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>
@@ -56,7 +55,7 @@
                 <span class="count">12</span>
             </a>
             <a href="#" class="profile">
-                <img src="images/logo.png">
+                <img src="/static/images/logo.png">
             </a>
         </nav>
         <!-- End of Navbar -->
@@ -203,7 +202,7 @@
 
     </div>
 
-    <script src="js/home.js"></script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>
 
 </html>

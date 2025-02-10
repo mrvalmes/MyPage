@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Cargar datos desde el archivo JSON
-  fetch('json/ventas.json')
+  fetch('/static/data/ventas.json')
     .then(response => {
       if (!response.ok) {
         throw new Error('Error al cargar el archivo JSON');

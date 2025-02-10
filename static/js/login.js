@@ -5,7 +5,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     const password = document.getElementById('password').value;
 
     
-    fetch('json/usuarios.json')
+    fetch('/static/data/usuarios.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Error al cargar los datos de usuarios');
@@ -17,7 +17,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             const user = users.find(user => user.email === email && user.password === password);
             if (user) {
                 //alert('Inicio de sesión exitoso');
-                window.location.href = 'home.html';
+                window.location.href = '/home';
             } else {
                 alert('Usuario o contraseña incorrectos');
             }

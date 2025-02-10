@@ -748,11 +748,11 @@ select {
     outline: 0;
     box-shadow: none;
     border: 0 !important;
-    background: var(--color-background);
-    background-image: none;
+    background: var(--dark);
+    background-image: var(--light);
     flex: 1;
     padding: 0 0.5em;
-    color: var(--color-dark);
+    color: var(--light);
     cursor: pointer;
     font-size: 1.6em;
     font-family: "Open Sans", sans-serif;
@@ -768,7 +768,7 @@ select::-ms-expand {
     width: 20em;
     height: 3em;
     line-height: 3;
-    background: #b3b8b7;
+    background: var(--dark);
     overflow: hidden;
     border-radius: 0.25em;
 }
@@ -779,14 +779,14 @@ select::-ms-expand {
     top: 0;
     right: 0;
     padding: 0 1em;
-    background: #545c5c;
+    background: var(--dark);
     cursor: pointer;
     pointer-events: none;
     transition: 0.25s all ease;
 }
 
 .select:hover::after {
-    color: #1bc2a3;
+    color: #017efa;
 }
 
 /*Fin main-chart*/
