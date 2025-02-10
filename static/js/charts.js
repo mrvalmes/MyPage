@@ -1,6 +1,7 @@
+// 1) Buscar la referencia al <canvas id="chartMain">
 const lineChart = document.getElementById('chartMain');
 
-const dataLine = {
+/*const dataLine = {
   labels: [
     'Enero',
     'Febrero',
@@ -94,8 +95,12 @@ const dataLine = {
       borderWidth: 2
     }
   ]
-};
+};*/
 
+
+
+
+// 2) Tus opciones genéricas (igual que tenías antes)
 const genericOptions = {
   responsive: true,
   hoverBackgroundColor: 'white',
@@ -106,7 +111,7 @@ const genericOptions = {
     x: { grid: { display: false } },
     y: {
       min: 0,
-      max: 200,
+      max: 500,
       ticks: { stepSize: 50 },
       grid: { borderDash: [5, 5] }
     }
@@ -143,7 +148,7 @@ const genericOptions = {
       usePointStyle: true,
       callbacks: {
         title: ctx => {
-          return `${ctx[0].label} 2024`;
+          return `${ctx[0].label} 2025`;
         },
         label: ctx => {
           return `${ctx.dataset.label}: ${ctx.raw}`;
@@ -153,6 +158,7 @@ const genericOptions = {
   }
 };
 
+// 3) Tus plugins de anotación
 const annotationLine = {
   id: 'annotationLine',
   beforeDraw: chart => {
@@ -163,7 +169,6 @@ const annotationLine = {
       const display = lineChart.getContext('2d');
 
       const gradient = display.createLinearGradient(0, 0, 0, 330);
-
       gradient.addColorStop(0, 'rgba(37, 75, 209, 0)');
       gradient.addColorStop(1, 'rgba(37, 75, 209, 0.1)');
 
@@ -198,41 +203,47 @@ const lineDash = {
   }
 };
 
-const configLine = {
-  type: 'line',
-  data: dataLine,
-  options: genericOptions,
-  plugins: [annotationLine, lineDash]
-};
+// 4) Variable global para la gráfica (para luego manipularla en filtros)
+let chartMain = null;
 
-const chartMain = new Chart(lineChart, configLine);
+// 5) Hacer fetch a endpoint Flask que genera {labels, datasets}
+function fetchAndRenderChart() {
+  // Tomar el valor del combo de año
+  const year = document.getElementById('yearSelect').value;
+  // Tomar el valor del combo de empleado
+  const employee = document.getElementById('employeeSelect').value;
 
-// Añadir event listeners a los filtros
-const filters = document.querySelectorAll('.filter');
+  // Construir la URL, si usas query string:
+  let url = `/chart-data?anio=${encodeURIComponent(year)}`;
+  if (employee) {
+    url += `&empleado=${encodeURIComponent(employee)}`;
+  }
 
-filters.forEach(filter => {
-  filter.addEventListener('click', () => {
-    // Remover la clase 'selected' de todos los filtros
-    filters.forEach(f => f.classList.remove('selected'));
+  fetch(url)
+    .then(response => response.json())
+    .then(dataLine => {
+      // Si ya tenías un chart creado, destrúyelo para volver a crearlo
+      if (chartMain) {
+        chartMain.destroy();
+      }
 
-    // Agregar la clase 'selected' al filtro clicado
-    filter.classList.add('selected');
+      // Construir config
+      const configLine = {
+        type: 'line',
+        data: dataLine,
+        options: genericOptions,
+        plugins: [annotationLine, lineDash]
+      };
 
-    // Obtener el label del filtro seleccionado
-    const selectedLabel = filter.getAttribute('data-label');
+      // Crear la gráfica
+      chartMain = new Chart(lineChart, configLine);
+    })
+    .catch(error => console.error("Error al cargar datos del gráfico:", error));
+}
 
-    if (selectedLabel === 'Todos') {
-      // Mostrar todos los datasets
-      chartMain.data.datasets.forEach(dataset => {
-        dataset.hidden = false;
-      });
-    } else {
-      // Filtrar los datasets para mostrar solo el seleccionado
-      chartMain.data.datasets.forEach(dataset => {
-        dataset.hidden = dataset.label !== selectedLabel;
-      });
-    }
+// Escuchar el evento 'change' en ambos <select> para actualizar el gráfico
+document.getElementById('yearSelect').addEventListener('change', fetchAndRenderChart);
+document.getElementById('employeeSelect').addEventListener('change', fetchAndRenderChart);
 
-    chartMain.update();
-  });
-});
+// Llamar una vez para inicializar
+fetchAndRenderChart();

@@ -1,6 +1,8 @@
-from flask import Flask, render_template, url_for
-import sqlite3
+from flask import Flask, render_template,jsonify, request
+from chart_utils import get_chart_data
 
+
+DB_PATH = r"C:\Users\Spectre\Documents\DBHeromovil\VentasHeromovil.db"
 
 app = Flask(__name__)
 
@@ -29,6 +31,14 @@ def dashboard():
     # Renderiza ventas.html
     # return render_template("Dashb.html", datos=rows)
     return render_template("dashboard.html")
+
+
+@app.route("/chart-data")
+def chart_data():
+    anio = request.args.get("anio", "2025")
+    empleado = request.args.get("empleado")  # None si no viene
+    data = get_chart_data(DB_PATH, anio=anio, empleado=empleado)
+    return jsonify(data)
 
 
 if __name__ == "__main__":
