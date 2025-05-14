@@ -12,7 +12,7 @@ closeBtn.addEventListener('click', () => {
 
 Vendedores.forEach(Vendedores => {
     const tr = document.createElement('tr');
-    let statusClass = '';       
+    //let statusClass = '';      
 
     const trContent = `
         <td>${Vendedores.nombreVend}</td>

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">        
     <title>Heromovil | HenryValmes</title>
 </head>
@@ -18,16 +19,18 @@
             <div class="logo-name"><span>Hero</span>Movil</div>
         </a>
         <ul class="side-menu">
-            <li class="active"><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>            
-            <li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
+            <li class="active"><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>
             <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
+            <li><a href="{{ url_for('Mantenimientos') }}"><i class='bx bx-atom'></i>Mantenimientos</a> </li>
+            <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-message-square-dots'></i>Comisiones</a></li>
+            <!--<li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
             <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
             <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
-            <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>
+            <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>-->
         </ul>
         <ul class="side-menu">
             <li>
-                <a href="#" class="logout">
+                <a href="{{ url_for('index') }}" class="logout">
                     <i class='bx bx-log-out-circle'></i>
                     Logout
                 </a>
@@ -48,12 +51,12 @@
                     <button class="search-btn" type="submit"><i class='bx bx-search'></i></button>
                 </div>
             </form>
-            <input type="checkbox" id="theme-toggle" hidden>
-            <label for="theme-toggle" class="theme-toggle"></label>
-            <a href="#" class="notif">
-                <i class='bx bx-bell'></i>
-                <span class="count">12</span>
-            </a>
+            <label for="switch" class="switch">
+                <input id="switch" type="checkbox" />
+                <span class="slider"></span>
+                <span class="decoration"></span>
+            </label>
+            
             <a href="#" class="profile">
                 <img src="/static/images/logo.png">
             </a>
@@ -63,105 +66,76 @@
         <main>
             <div class="header">
                 <div class="left">
-                    <h1>Dashboard</h1>
+                    <h1>Resultados Generales</h1>
                     <ul class="breadcrumb">
                         <li><a href="#">
-                                Analiticas
+                                Inicio
                             </a></li>
                         /
-                        <li><a href="#" class="active">Tiendas</a></li>
+                        <li><a href="#" class="active">General</a></li>
                     </ul>
                 </div>
-                <a href="#" class="report">
+                <!--<a href="#" class="report">
                     <i class='bx bx-cloud-download'></i>
                     <span>Descargar CSV</span>
-                </a>
+                </a>-->
             </div>
 
-            <!-- Insights -->
-            <ul class="insights">
-                <li>
-                    <i class='bx bx-calendar-check'></i>
-                    <span class="info">
-                        <h3>
-                            1,074
-                        </h3>
-                        <p>Paid Order</p>
-                    </span>
-                </li>
-                <li><i class='bx bx-show-alt'></i>
-                    <span class="info">
-                        <h3>
-                            3,944
-                        </h3>
-                        <p>Site Visit</p>
-                    </span>
-                </li>
-                <li><i class='bx bx-line-chart'></i>
-                    <span class="info">
-                        <h3>
-                            14,721
-                        </h3>
-                        <p>Searches</p>
-                    </span>
-                </li>
-                <li><i class='bx bx-dollar-circle'></i>
-                    <span class="info">
-                        <h3>
-                            $6,742
-                        </h3>
-                        <p>Total Sales</p>
-                    </span>
-                </li>
-            </ul>
-            <!-- End of Insights -->
+        <!-- Tarjetas -->
+        <ul class="insights">
+            <li>
+                <i class='bx bx-calendar-check'></i>
+                <span class="info">
+                    <h3 id="pav-value">0</h3>
+                    <p>PAV</p>
+                </span>
+            </li>
+            <li><i class='bx bx-show-alt'></i>
+                <span class="info">
+                    <h3 id="clientes-value">0</h3>
+                    <p>Clientes Atendidos(Pagos)</p>
+                </span>
+            </li>
+            <li><i class='bx bx-line-chart'></i>
+                <span class="info">
+                    <h3 id="conversion-value">0%</h3>
+                    <p>Conversion</p>
+                </span>
+            </li>
+            <li><i class='bx bx-dollar-circle'></i>
+                <span class="info">
+                    <h3 id="comision-value">$0</h3>
+                    <p>Comision</p>
+                </span>
+            </li>
+        </ul>
+        <!--Fin tarjetas -->
 
+            <!-- Tabla Ordenes -->
             <div class="bottom-data">
-                <div class="orders">
+                <div class="orders" id="top-empleados">
                     <div class="header">
                         <i class='bx bx-receipt'></i>
-                        <h3>Recent Orders</h3>
-                        <i class='bx bx-filter'></i>
-                        <i class='bx bx-search'></i>
+                        <h3>Top10 Pav Ranking</h3>
+                        <!--<i class='bx bx-filter'></i>
+                        <i class='bx bx-search'></i>-->
                     </div>
-                    <table>
+                    <table class="greyGridTable">
                         <thead>
                             <tr>
-                                <th>User</th>
-                                <th>Order Date</th>
+                                <th>Vendedor</th>
+                                <th>Total PAV</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <img src="images/profile-1.jpg">
-                                    <p>John Doe</p>
-                                </td>
-                                <td>14-08-2023</td>
-                                <td><span class="status completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <img src="images/profile-1.jpg">
-                                    <p>John Doe</p>
-                                </td>
-                                <td>14-08-2023</td>
-                                <td><span class="status pending">Pending</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <img src="images/profile-1.jpg">
-                                    <p>John Doe</p>
-                                </td>
-                                <td>14-08-2023</td>
-                                <td><span class="status process">Processing</span></td>
-                            </tr>
+                            <!-- Se llenará dinámicamente con JS -->
                         </tbody>
                     </table>
-                </div>
+                </div>            
+                <!-- End of Orders -->
 
-                <!-- Reminders -->
+                <!-- Reminders 
                 <div class="reminders">
                     <div class="header">
                         <i class='bx bx-note'></i>
@@ -192,17 +166,15 @@
                             <i class='bx bx-dots-vertical-rounded'></i>
                         </li>
                     </ul>
-                </div>
-
+                </div>-->
                 <!-- End of Reminders-->
-
             </div>
-
         </main>
-
     </div>
 
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
 </body>
 
 </html>

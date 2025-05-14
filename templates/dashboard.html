@@ -4,16 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js"></script>    
     <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cargas.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    
+    <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">       
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cargas.css') }}">    
     <title>Heromovil | HenryValmes</title>
 </head>
 
 <body>
-
     <!-- Sidebar -->
     <div class="sidebar">
         <a href="#" class="logo">
@@ -21,12 +21,14 @@
             <div class="logo-name"><span>Hero</span>Movil</div>
         </a>
         <ul class="side-menu">
-            <li><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>
-            <li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
+            <li><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>            
             <li class="active"><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
+            <li><a href="{{ url_for('Mantenimientos') }}"><i class='bx bx-atom'></i>Mantenimientos</a> </li>
+            <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-message-square-dots'></i>Comisiones</a></li>
+            <!--<li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
             <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
             <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
-            <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>
+            <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>-->
         </ul>
         <ul class="side-menu">
             <li>
@@ -52,16 +54,12 @@
                 </div>
             </form>
 
-            <input type="checkbox" id="theme-toggle" hidden>            
-            <label for="theme-toggle" class="theme-toggle">
-                <i class='bx bx-moon'></i>
-                <i class='bx bx-sun'></i>
+            <label for="switch" class="switch">
+                <input id="switch" type="checkbox" />
+                <span class="slider"></span>
+                <span class="decoration"></span>
             </label>
 
-            <!--<a href="#" class="notif">
-                <i class='bx bx-bell'></i>
-                <span class="count">12</span>
-            </a>-->
             <a href="#" class="profile">
                 <img src="/static/images/logo.png">
             </a>
@@ -81,10 +79,10 @@
                         <li><a href="#" class="active">Ventas</a></li>
                     </ul>
                 </div>
-                <a href="#" class="report">
+                <!--<a href="#" class="report">
                     <i class='bx bx-cloud-download'></i>
                     <span>Download CSV</span>
-                </a>
+                </a>-->
             </div>
             <!-- End of info -->
 
@@ -93,21 +91,18 @@
                 <li>
                     <i class='bx bx-check-double'></i>
                     <span class="info">
-                        <h3>
-                            Vendedor
-                        </h3>                        
+                        <div class="select">
+                            <select id="supervisoreSelect">
+                                <option value="None" selected>Selecciona Supervisor</option>
+                            </select>
+                        </div>
                     </span>
                 </li>
                 <li><i class='bx bx-chevron-right'></i>
                     <span class="info">
                         <div class="select">
                             <select id="employeeSelect">
-                                <option value="none" selected>Selecciona Empleado</option>
-                                <option value="opcion1">Erika Vargas</option>
-                                <option value="opcion2">Maria Delgado</option>
-                                <option value="opcion3">Santa Silva</option>
-                                <option value="opcion4">Lishmery Adames</option>
-                                <option value="opcion5">Jose Manuel</option>
+                                <option value="None" selected>Selecciona Empleado</option>                                
                             </select>
                         </div>                    
                     </span>
@@ -120,88 +115,107 @@
                 <li>
                     <i class='bx bx-calendar-check'></i>
                     <span class="info">
-                        <h3>
-                            25
-                        </h3>
+                        <h3 id="pav-value">0</h3>
                         <p>PAV</p>
                     </span>
                 </li>
                 <li><i class='bx bx-show-alt'></i>
                     <span class="info">
-                        <h3>
-                            500
-                        </h3>
-                        <p>Clientes Atendidos</p>
+                    <h3 id="clientes-value">0</h3>
+                    <p>Clientes Atendidos(Pagos)</p>                    
                     </span>
                 </li>
                 <li><i class='bx bx-line-chart'></i>
                     <span class="info">
-                        <h3>
-                            5%
-                        </h3>
-                        <p>Conversion</p>
+                        <h3 id="conversion-value">0%</h3>
+                        <p>Conversion</p>                        
                     </span>
                 </li>
                 <li><i class='bx bx-dollar-circle'></i>
                     <span class="info">
-                        <h3>
-                            $1,035
-                        </h3>
-                        <p>Comision</p>
+                    <h3 id="comision-value">$0</h3>
+                    <p>Comision</p>
                     </span>
                 </li>
             </ul>
-            <!--Fin tarjetas -->
-            
-            <!--Detalle Ventas-->
+            <!--Fin tarjetas -->          
+        
+            <!-- Tabla Ordenes -->  
             <div class="bottom-data">
-                <div class="orders" id="obj-rest">
-                    <h2>Obetivos / Resultados</h2>
-                    <table>
+                <div class="orders" id="obj-rest" name="obj-rest">
+                    <div class="header">
+                        <i class='bx bx-receipt'></i>
+                        <h3>Obetivos vs Resultados</h3>
+                        <!--<i class='bx bx-filter'></i>
+                        <i class='bx bx-search'></i>-->
+                    </div>
+                    <table class="greyGridTable">
                         <thead>
                             <tr>
                                 <th>
-                                    <h4>Producto</h4>
+                                    <h2>Producto</h2>
                                 </th>
                                 <th>
-                                    <h4>Objetivo</h4>
+                                    <h2>Objetivo</h2>
                                 </th>
                                 <th>
-                                    <h4>Resultado</h4>
+                                    <h2>Resultado</h2>
                                 </th>
                                 <th>
-                                    <h4>Logro</h4>
+                                    <h2>Logro</h2>
                                 </th>
                                 <th>
-                                    <h4>Proyeccion</h4>
+                                    <h2>Proyeccion</h2>
                                 </th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
-                </div>
+                </div>               
             </div>
-            <!--Detalle Ventas Fin-->
+            <!-- tabla empleados -->
+
 
             <!-- Datos Generales -->
             <div class="bottom-data">
                 <div class="orders">                
                     <!--Chart lieal inicio-->
-                    <section id="main-chart" class="recent-orders">  
-                        <div class="select">
+                    <section id="main-chart" class="recent-orders"> 
+                        <div class="ordenp">
+                            <div class="select_anio">                   
                         <select id="yearSelect">
                             <option value="2023">2023</option>
                             <option value="2024">2024</option>
                             <option value="2025" selected>2025</option>
-                        </select>  
-                        </div>                      
+                        </select>                         
+                        </div>
+                        <div class="select_anio">
+                            <select id="modeSelect">
+                                <option value="resultados">Resultados</option>
+                                <option value="logro">Logro</option>
+                            </select>
+                        </div>
+                        <!--<input id="maxInput" type="number" placeholder="Escala" class="input" value="85">
+                        <input id="stepInput" type="number" placeholder="Rango" class="input" value="5">
+                        <button class="buttongo" onclick="actualizarEscala()">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"></path>
+                            </svg>
+                            <div class="text">
+                                Actualizar Escala
+                            </div>
+                        </button> -->
+                        </div> 
                         <header>
                             <div class="wrapper-reach">
                                 <div class="wrapper-filter">
                                     <div class="filters">
                                         <div class="filter selected" data-label="Todos">
                                             <p>Todo</p>
+                                        </div>
+                                        <div class="filter" data-label="Card">
+                                            <p>Card Simo</p>
                                         </div>
                                         <div class="filter" data-label="Flex/Max">
                                             <p>Flex</p>
@@ -212,49 +226,24 @@
                                         <div class="filter" data-label="Migraciones">
                                             <p>Migraciones</p>
                                         </div>
-                                        <div class="filter" data-label="Aumentos Pospago">
-                                            <p>Aumentos</p>
-                                        </div>
-                                        <div class="filter" data-label="Aumentos Internet">
-                                            <p>Aumentos Net</p>
-                                        </div>
-                                        <div class="filter" data-label="Fidepuntos Pospago">
+                                        <div class="filter" data-label="Fidepuntos Pos">
                                             <p>Fide Pos</p>
                                         </div>
-                                        <div class="filter" data-label="Fidepuntos Aumento">
+                                        <div class="filter" data-label="Fidepuntos Up">
                                             <p>Fide Up</p>
                                         </div>
-                                        <div class="filter" data-label="Fidepuntos Disminucion">
-                                            <p>Fide Down</p>
+                                        <div class="filter" data-label="Reemplazo Pos">
+                                            <p>Reemplazo Pos</p>
                                         </div>
-                                        <div class="filter" data-label="Reemplazo Pospago">
-                                            <p>Reemp Pos</p>
+                                        <div class="filter" data-label="Reemplazo Up">
+                                            <p>Reemplazo Up</p>
                                         </div>
-                                        <div class="filter" data-label="Reemplazo Aumento'">
-                                            <p>Reemp Up</p>
+                                        <div class="filter" data-label="Fide Reemp Internet Up">
+                                            <p>Fide Reemp Internet Up</p>
                                         </div>
-                                        <div class="filter" data-label="Reemplazo Disminucion'">
-                                            <p>Reemp Down</p>
-                                        </div>
-                                        <div class="filter" data-label="Reemplazo Internet">
-                                            <p>Reemp Net</p>
-                                        </div>
-                                        <div class="filter" data-label="Fidepuntos Internet">
-                                            <p>Fide Net</p>
-                                        </div>
-                                        <div class="filter" data-label="Fidepuntos InternetAum">
-                                            <p>Fide NetUp</p>
-                                        </div>
-                                        <div class="filter" data-label="Fidepuntos InternetDism">
-                                            <p>Fide NetDown</p>
-                                        </div>
-                                        <div class="filter" data-label="Reemplazo InternetAum">
-                                            <p>Reemp NetUp</p>
-                                        </div>
-                                        <div class="filter" data-label="Reemplazo InternetDism">
-                                            <p>Reemp NetDown</p>
-                                        </div>
-                                        
+                                        <div class="filter" data-label="Aumentos">
+                                            <p>Aumentos</p>
+                                        </div>                                        
                                     </div>
                                 </div>
                             </div>
@@ -265,11 +254,13 @@
                     </section>
                     <!--Chart lieal inicio-->
                 </div>
-            </div>
+            </div>            
         </main>
 
     </div>      
-    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>   
+    <script src="{{ url_for('static', filename='js/objrest.js') }}"></script>
     <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
 </body>
 </html>

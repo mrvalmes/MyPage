@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Heromovil</title>
+
+    <!-- Logo (opcional ponerlo en <body> o <head>) 
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">-->
+
+    <!-- CSS de login -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <section>
+        <form id="loginForm">
+            <h1>Inicio</h1>
+            <div class="inputbox">
+                <ion-icon name="mail-outline"></ion-icon>
+                <input type="email" id="email" required>
+                <label>Usuario</label>
+            </div>
+            <div class="inputbox">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" id="password" required>
+                <label>Contraseña</label>
+            </div>
+            <div class="forget">
+                <a href="#">Olvidé la Contraseña</a>
+            </div>
+            <button type="submit">Iniciar</button>
+        </form>
+    </section>
+
+    <!-- Tu script de login -->
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+
+</html>

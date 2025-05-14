@@ -11,18 +11,22 @@
     },
     {
         "email": "aferreira@heromovil",
-        "password": "12345",
+        "password": "a12345",
         "type": 2
     },
     {
         "email": "akatz@heromovil",
-        "password": "12345",
+        "password": "ak12345",
         "type": 2
-    }
-    ,
+    },
     {
-        "email": "ventas@heromovil",
-        "password": "12345",
-        "type": 3
+        "email": "marleny@heromovil",
+        "password": "m12345",
+        "type": 2
+    },
+    {
+        "email": "mmedrano@heromovil",
+        "password": "ma12345",
+        "type": 2
     }
 ]

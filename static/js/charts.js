@@ -1,106 +1,19 @@
-// 1) Buscar la referencia al <canvas id="chartMain">
+//Inicio cargar el chart lineal
+//Variable global para la gráfica (para luego manipularla en filtros)
+let chartMain = null;
+let showPercentage = false;
+//Buscar la referencia al <canvas id="chartMain">
 const lineChart = document.getElementById('chartMain');
+function actualizarEscala() {
+  const nuevoMax = parseInt(document.getElementById('maxInput').value, 10) || 85;
+  const nuevoStep = parseInt(document.getElementById('stepInput').value, 10) || 5;
 
-/*const dataLine = {
-  labels: [
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Septiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre'
-  ],
-  datasets: [
-    {
-      label: 'Card',
-      data: [22, 48, 41, 53, 82, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(255, 255, 0, 1)',
-      borderColor: 'rgba(255, 255, 0, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Flex',
-      data: [65, 92, 53, 114, 72, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(1, 126, 250, 1)',
-      borderColor: 'rgba(1, 126, 250, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Internet',
-      data: [49, 111, 102, 49, 58, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(0, 255, 0, 1)',
-      borderColor: 'rgba(0, 255, 0, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Fijos',
-      data: [10, 8, 15, 0, 3, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(255, 0, 255, 1)',
-      borderColor: 'rgba(255, 0, 255, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Migra',
-      data: [8, 14, 10, 11, 2, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(255, 165, 0, 1)',
-      borderColor: 'rgba(255, 165, 0, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Fide Pos',
-      data: [4, 3, 1, 2, 5, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(128, 0, 128, 1)',
-      borderColor: 'rgba(128, 0, 128, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Fide Up',
-      data: [16, 7, 30, 9, 8, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(255, 192, 203, 1)',
-      borderColor: 'rgba(255, 192, 203, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Reemp Pos',
-      data: [20, 25, 22, 24, 30, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(0, 128, 128, 1)',
-      borderColor: 'rgba(0, 128, 128, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Reemp Up',
-      data: [20, 21, 23, 30, 12, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(0, 255, 128, 1)',
-      borderColor: 'rgba(0, 255, 128, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Fide/Reemp Net Up',
-      data: [3, 1, 4, 6, 7, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(255, 0, 0, 1)',
-      borderColor: 'rgba(255, 0, 0, 1)',
-      borderWidth: 2
-    },
-    {
-      label: 'Aumentos',
-      data: [100, 54, 66, 70, 55, 0, 0, 0, 0, 0, 0, 0],
-      backgroundColor: 'rgba(0, 0, 255, 1)',
-      borderColor: 'rgba(0, 0, 255, 1)',
-      borderWidth: 2
-    }
-  ]
-};*/
+  chartMain.options.scales.y.max = nuevoMax;
+  chartMain.options.scales.y.ticks.stepSize = nuevoStep;
+  chartMain.update();
+}
 
-
-
-
-// 2) Tus opciones genéricas (igual que tenías antes)
+//opciones genéricas
 const genericOptions = {
   responsive: true,
   hoverBackgroundColor: 'white',
@@ -111,8 +24,8 @@ const genericOptions = {
     x: { grid: { display: false } },
     y: {
       min: 0,
-      max: 500,
-      ticks: { stepSize: 50 },
+      max: 50,
+      ticks: { stepSize: 5 },
       grid: { borderDash: [5, 5] }
     }
   },
@@ -148,17 +61,17 @@ const genericOptions = {
       usePointStyle: true,
       callbacks: {
         title: ctx => {
-          return `${ctx[0].label} 2025`;
+          return `${ctx[0].label}`;
         },
         label: ctx => {
-          return `${ctx.dataset.label}: ${ctx.raw}`;
+          return `${ctx.dataset.label}: ${ctx.raw}${showPercentage ? ' %' : ''}`;
         }
       }
     }
   }
 };
 
-// 3) Tus plugins de anotación
+//plugins de anotación
 const annotationLine = {
   id: 'annotationLine',
   beforeDraw: chart => {
@@ -169,15 +82,15 @@ const annotationLine = {
       const display = lineChart.getContext('2d');
 
       const gradient = display.createLinearGradient(0, 0, 0, 330);
-      gradient.addColorStop(0, 'rgba(37, 75, 209, 0)');
+      gradient.addColorStop(0, 'rgba(41, 233, 16, 0)');
       gradient.addColorStop(1, 'rgba(37, 75, 209, 0.1)');
 
       ctx.beginPath();
       ctx.moveTo(activePoint.element.x, chart.chartArea.top);
       ctx.lineTo(activePoint.element.x, chart.chartArea.bottom);
-      ctx.lineWidth = 40;
+      ctx.lineWidth = 60;
       ctx.strokeStyle = gradient;
-      ctx.strokeRect(activePoint.element.x, chart.chartArea.top, 0, 282);
+      ctx.strokeRect(activePoint.element.x, chart.chartArea.top, 0, 430);
       ctx.restore();
     }
   }
@@ -190,12 +103,11 @@ const lineDash = {
       const ctx = chart.ctx;
       ctx.save();
       const activePoint = chart.tooltip._active[0];
-
       ctx.beginPath();
       ctx.setLineDash([5, 5]);
       ctx.moveTo(activePoint.element.x, chart.chartArea.top);
       ctx.lineTo(activePoint.element.x, chart.chartArea.bottom);
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       ctx.strokeStyle = 'rgba(1, 126, 250, 0.8)';
       ctx.stroke();
       ctx.restore();
@@ -203,31 +115,64 @@ const lineDash = {
   }
 };
 
-// 4) Variable global para la gráfica (para luego manipularla en filtros)
-let chartMain = null;
-
-// 5) Hacer fetch a endpoint Flask que genera {labels, datasets}
 function fetchAndRenderChart() {
-  // Tomar el valor del combo de año
+  const employeeSelect = document.getElementById('employeeSelect');
+  const supervisoreSelect = document.getElementById('supervisoreSelect');
+  const mode = document.getElementById('modeSelect').value;
   const year = document.getElementById('yearSelect').value;
-  // Tomar el valor del combo de empleado
-  const employee = document.getElementById('employeeSelect').value;
 
-  // Construir la URL, si usas query string:
+  let empleadoId = employeeSelect.value;
+  let supervisorId = supervisoreSelect.value;
+
+  let id = '';
+
   let url = `/chart-data?anio=${encodeURIComponent(year)}`;
-  if (employee) {
-    url += `&empleado=${encodeURIComponent(employee)}`;
+
+  // Limpiar el otro selector cuando uno es seleccionado
+  if (supervisorId && supervisorId !== "None") {
+    employeeSelect.value = "None"; // Limpiar la selección de empleado
+    url += `&supervisor=${encodeURIComponent(supervisorId)}&modo=${mode}`;    
+    id = supervisorId;
+
+  } else if (empleadoId && empleadoId !== "None") {
+    supervisoreSelect.value = "None"; // Limpiar la selección de supervisor
+    url += `&empleado=${encodeURIComponent(empleadoId)}&modo=${mode}`;    
+    id = empleadoId; 
+
+  } else {
+    // Manejar el caso en que ambos son "None"
+    url += `&empleado=None`;
+  }
+
+  if (mode == 'logro') {
+    showPercentage = true;
+  } else {
+    showPercentage = false;
   }
 
   fetch(url)
     .then(response => response.json())
     .then(dataLine => {
-      // Si ya tenías un chart creado, destrúyelo para volver a crearlo
       if (chartMain) {
         chartMain.destroy();
       }
 
-      // Construir config
+      if (mode === "logro" && id !== "None") {
+        genericOptions.scales.y.min = 0;
+        genericOptions.scales.y.max = 150;
+        genericOptions.scales.y.ticks.stepSize = 10;
+      } else if (mode === "resultados") {
+        if (id === "None") {
+          genericOptions.scales.y.min = 0;
+          genericOptions.scales.y.max = 500;
+          genericOptions.scales.y.ticks.stepSize = 5;
+        } else {
+          genericOptions.scales.y.min = 0;
+          genericOptions.scales.y.max = 85;
+          genericOptions.scales.y.ticks.stepSize = 5;
+        }
+      }
+
       const configLine = {
         type: 'line',
         data: dataLine,
@@ -235,15 +180,44 @@ function fetchAndRenderChart() {
         plugins: [annotationLine, lineDash]
       };
 
-      // Crear la gráfica
       chartMain = new Chart(lineChart, configLine);
-    })
+
+      // Añadir event listeners a los filtros
+      const filters = document.querySelectorAll('.filter');
+
+      filters.forEach(filter => {
+        filter.addEventListener('click', () => {
+          // Remover la clase 'selected' de todos los filtros
+          filters.forEach(f => f.classList.remove('selected'));
+
+          // Agregar la clase 'selected' al filtro clicado
+          filter.classList.add('selected');
+
+          // Obtener el label del filtro seleccionado
+          const selectedLabel = filter.getAttribute('data-label');
+
+          if (selectedLabel === 'Todos') {
+            // Mostrar todos los datasets
+            chartMain.data.datasets.forEach(dataset => {
+              dataset.hidden = false;
+            });
+          } else {
+            // Filtrar los datasets para mostrar solo el seleccionado
+            chartMain.data.datasets.forEach(dataset => {
+              dataset.hidden = dataset.label !== selectedLabel;
+              genericOptions.scales.y.max = dataset.value; // Escalar grafico al valor maximo del filtro seleccionado.              
+            });
+          }
+          chartMain.update();
+        });
+      });
+    })  
     .catch(error => console.error("Error al cargar datos del gráfico:", error));
 }
-
-// Escuchar el evento 'change' en ambos <select> para actualizar el gráfico
+// Escuchar el evento 'change' en <select> para actualizar el gráfico
 document.getElementById('yearSelect').addEventListener('change', fetchAndRenderChart);
+document.getElementById('modeSelect').addEventListener('change', fetchAndRenderChart);
 document.getElementById('employeeSelect').addEventListener('change', fetchAndRenderChart);
-
+document.getElementById('supervisoreSelect').addEventListener('change', fetchAndRenderChart);
 // Llamar una vez para inicializar
 fetchAndRenderChart();
