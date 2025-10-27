@@ -272,7 +272,9 @@ def api_pav():
 
 @app.route("/api/top_ventas")
 def api_topventas():
-    return jsonify(get_rank_pav())
+    top_ventas_data = get_rank_pav()
+    formatted_data = [{"nombre": row[0], "total_pav": row[1]} for row in top_ventas_data]
+    return jsonify(formatted_data)
 
 @app.route("/api/top_ventas_cc")
 def api_topventas_cc():

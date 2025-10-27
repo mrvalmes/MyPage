@@ -21,8 +21,7 @@
         <ul class="side-menu">
             <li><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>
             <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
-            <li><a href="{{ url_for('Mantenimientos') }}"><i class='bx bx-atom'></i>Mantenimientos</a> </li>
-            <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-message-square-dots'></i>Comisiones</a></li>
+            <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
             <li class="active"><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
         </ul>
         <ul class="side-menu">
@@ -63,7 +62,7 @@
         <main>
             <div class="header">
                 <div class="left">
-                    <h1>Posiciones - La Casa de Heromovil</h1>
+                    <h1>La Casa de Heromovil</h1>
                     <ul class="breadcrumb">
                         <li><a href="#">
                                 Dashboard
@@ -81,18 +80,18 @@
                         <h2>Tabla de PAV</h2>
                         <p>26 de octubre de 2025</p>
                     </div>
-                    <div class="logo-section">
-                        <img src="/static/images/logo.png" alt="La Caba" class="event-logo">
-                    </div>
+                    <!--<div class="logo-section">
+                        <img src="/static/images/1003779.jpg" alt="La Caba" class="event-logo">
+                    </div>-->
                 </div>
 
                 <div class="leaderboard-grid">
                     
                     <div class="participant-card">
-                        <span class="position-number">1</span>
-                        <img src="/static/images/logo.png" alt="Michael Flores" class="profile-pic">
-                        <h3 class="participant-name">Jose Manuel Contreras</h3> <!-- Aqui el nombre-->
-                        <p class="participant-points" style="color: #A0E86F;">78</p> <!-- Aqui el total de PAV-->
+                        <span class="position-number">1</span>                        
+                        <img src="/static/images/logo.png" alt="Nombre" class="profile-pic">
+                        <h3 class="participant-name">Nombre</h3> 
+                        <p class="participant-points" style="color: #A0E86F;">0</p> 
                         <span class="points-label">PAV</span>
                         <span class="position-change up">↑ +1</span>
                     </div>
@@ -105,6 +104,7 @@
 
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
+<script src="{{ url_for('static', filename='js/posiciones.js') }}"></script>
 </body>
 
 </html>

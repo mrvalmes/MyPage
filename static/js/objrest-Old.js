@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { label: "Aumentos Plan Pos/Net", claveObj: "aumentos_plan_pos_net", claveRes: "Aumentos" }
     // En caso de (recargas, fijos_hfc_dth, etc.)
   ];
+  
   // Mapeo de las columnas en "resultados" para obtener la suma de PAV
   const mapPav = [
     //{ label: "Sim Card Prepago", claveObj: "sim_card_prepago", claveRes: "Card" },

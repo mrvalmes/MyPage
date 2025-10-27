@@ -23,8 +23,7 @@
         <ul class="side-menu">
             <li><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>            
             <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
-            <li><a href="{{ url_for('Mantenimientos') }}"><i class='bx bx-atom'></i>Mantenimientos</a> </li>
-            <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-message-square-dots'></i>Comisiones</a></li>
+            <li class="active"><a href="{{ url_for('Comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
             <li><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
             <!--<li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
             <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>-->
@@ -83,31 +82,7 @@
                     <span>Download CSV</span>
                 </a>-->
             </div>
-            <!-- End of info -->
-
-            <!--Selector de Empleado-->           
-            <ul class="insights">
-                <li>
-                    <i class='bx bx-check-double'></i>
-                    <span class="info">
-                        <div class="select">
-                            <select id="supervisoreSelect">
-                                <option value="None" selected>Selecciona Supervisor</option>
-                            </select>
-                        </div>
-                    </span>
-                </li>
-                <li><i class='bx bx-chevron-right'></i>
-                    <span class="info">
-                        <div class="select">
-                            <select id="employeeSelect">
-                                <option value="None" selected>Selecciona Empleado</option>                                
-                            </select>
-                        </div>                    
-                    </span>
-                </li>
-            </ul>
-            <!--Selector de Empleado Fin-->        
+            <!-- End of info -->     
         
             <!-- Tabla Ordenes -->  
             <div class="bottom-data">
@@ -115,6 +90,11 @@
                     <div class="header">
                         <i class='bx bx-receipt'></i>
                         <h3>Incentivos</h3>
+                        <div class="select">
+                            <select id="employeeSelect">
+                                <option value="None" selected>Selecciona Empleado</option>                                
+                            </select>
+                        </div> 
                         <!--<i class='bx bx-filter'></i>
                         <i class='bx bx-search'></i>-->
                     </div>
@@ -146,14 +126,13 @@
                 </div>               
             </div>
             <!-- tabla empleados -->
-
-
-            <!-- Datos Generales -->
+             
+            <!-- Datos Generales 
             <div class="bottom-data">
                 <div class="orders">                
                     
                 </div>
-            </div>            
+            </div>-->            
         </main>
 
     </div>          

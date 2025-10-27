@@ -1082,19 +1082,19 @@ input[type="date"] {
 }
 
 .leaderboard-header .title-section h2 {
-    color: #FFF; /* Color blanco para el título */
+    color: var(--dark); /* Color blanco para el título */
     font-size: 28px;
     margin: 0;
 }
 
 .leaderboard-header .title-section p {
-    color: #AAA; /* Color gris para la fecha */
+    color: var(--dark); /* Color gris para la fecha */
     font-size: 14px;
     margin: 0;
 }
 
 .leaderboard-header .event-logo {
-    height: 60px; /* Ajusta el tamaño del logo */
+    height: 120px; /*tamaño del logo */
     width: auto;
     object-fit: contain;
 }
@@ -1109,13 +1109,13 @@ input[type="date"] {
 
 /* Tarjeta individual de participante */
 .participant-card {
-    background-color: #1A1A1A; /* Fondo de tarjeta oscuro */
+    background-color:var(--light); /* Fondo de tarjeta */
     border-radius: 15px;
     padding: 25px 20px;
     text-align: center;
     position: relative;
     border: 1px solid #333; /* Borde sutil */
-    color: #FFF; /* Texto blanco por defecto */
+    color: var(--dark); /* Color de Texto*/
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1131,7 +1131,7 @@ input[type="date"] {
     left: 15px;
     font-size: 20px;
     font-weight: bold;
-    color: #777;
+    color: var(--dark);
 }
 
 /* Foto de perfil circular */
@@ -1157,7 +1157,7 @@ input[type="date"] {
 
 
 .participant-card .participant-name {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     margin: 0 0 5px 0;
     white-space: nowrap;
@@ -1166,14 +1166,14 @@ input[type="date"] {
 }
 
 .participant-card .participant-points {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
     margin: 0;
 }
 
 .participant-card .points-label {
     font-size: 12px;
-    color: #AAA;
+    color: var(--dark);
     display: block;
     margin-bottom: 15px;
     text-transform: uppercase;
