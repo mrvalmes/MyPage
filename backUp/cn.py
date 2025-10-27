@@ -9,12 +9,7 @@ def empleados():
     DB_PATH = conect()
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("""SELECT codigo, nombre
-                        FROM usuarios
-                        WHERE status = 1
-                        AND puesto IN ('Ventas', 'Supervisor')
-                        AND codigo NOT IN ('1003779', '1016312', '1020462')
-                        ORDER BY nombre ASC;""")
+    cursor.execute("SELECT codigo, nombre FROM usuarios WHERE status = 1")
     rows = cursor.fetchall()
     conn.close()
 
@@ -50,14 +45,16 @@ def pagos(empleado_id):
         SELECT COUNT(*)
         FROM pagos
         WHERE SUBSTR(userlogin, 1, 7) = ?
-        AND strftime('%Y-%m', dte) = strftime('%Y-%m', 'now', 'localtime');        
+        AND SUBSTR(dte,4,2) = strftime('%m','now', 'localtime')
+        AND SUBSTR(dte,7,4) = strftime('%Y','now', 'localtime')
         """
         cur.execute(query, (empleado_id,))
     else:
         query = """
         SELECT COUNT(*)
         FROM pagos
-        WHERE strftime('%Y-%m', dte) = strftime('%Y-%m', 'now', 'localtime');
+        WHERE SUBSTR(dte,4,2) = strftime('%m','now', 'localtime')
+        AND SUBSTR(dte,7,4) = strftime('%Y','now', 'localtime')
         """
         cur.execute(query)
 
@@ -71,6 +68,7 @@ def pagos(empleado_id):
     else:
         return 0
 
+
 def get_ventas():
     """
     Retorna la cantidad (conteo) de registros de la tabla 'Venta_detalle'
@@ -82,7 +80,6 @@ def get_ventas():
     SELECT SUM(total_ventas) AS total_pav
 	FROM ventas_detalle
 	WHERE tipo_venta != 'Card'
-	AND entity_code = '44066'
 	AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
 	AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
     """
@@ -110,36 +107,21 @@ def get_rank_pav():
         SUM(total_ventas) AS total_ventas
     FROM ventas_detalle
     WHERE tipo_venta != 'Card'
-    AND entity_code  != 'EX332'
-    AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
-    AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
-    GROUP BY usuario_creo_orden
-    ORDER BY total_ventas DESC
-    LIMIT 10;
-    """
-    cur.execute(query)
-    # fetchall para todas las filas
-    filas = cur.fetchall()
-
-    conn.close()
-
-    # 'filas' será una lista de tuplas: [(usuario_creo_orden, total_ventas), ...]
-    return filas
-
-def get_rank_pav_cc():
-    """
-    Retorna los top 10 usuarios (usuario_creo_orden) y su suma de ventas
-    para el mes/año actual, excluyendo 'entidad 44066'.
-    """
-    conn = sqlite3.connect(conect())
-    cur = conn.cursor()
-
-    query = """
-    SELECT usuario_creo_orden,
-        SUM(total_ventas) AS total_ventas
-    FROM ventas_detalle
-    WHERE tipo_venta != 'Card'
-    AND entity_code  != '44066'
+    AND usuario_creo_orden  != '1013843 - JUAN CARLOS GRULLON GARCIA'
+    AND usuario_creo_orden  != '1013437 - ANABEL MARTE'
+    AND usuario_creo_orden  != '1018784 - KANDY PENELOPE JIMENEZ JIMENEZ'
+    AND usuario_creo_orden  != '1018294 - MARIA VANESSA MOSQUEA ABAD'
+    AND usuario_creo_orden  != '1018940 - ADAMARYS RODRIGUEZ BATISTA'
+    AND usuario_creo_orden  != '2025551 - ANGEL NOEL CAMPOS LORA'
+    AND usuario_creo_orden  != '1003794 - CARINA DE LA CRUZ CASTILLO' 
+    AND usuario_creo_orden  != '2025552 - ARLYN ROSARIO LOPEZ'  
+    AND usuario_creo_orden  != '1025332 - EDWIN GRULLON ROSARIO'
+    AND usuario_creo_orden  != '1025727 - FLORANGEL ISABEL ALMONTE TOLENTINO'
+    AND usuario_creo_orden  != '1025456 - ANDISON LIMA MATIAS'
+    AND usuario_creo_orden  != '1025677 - MAURIFE MATEO PEÑA'
+    AND usuario_creo_orden  != '1025674 - ROLANDO PICHARDO DISLA'
+    AND usuario_creo_orden  != '1025676 - MARIA LUISA DELGADO DE LA CRUZ'
+    AND usuario_creo_orden  != '1025679 - YISELLE ESPINAL VARGAS'
     AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
     AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
     GROUP BY usuario_creo_orden

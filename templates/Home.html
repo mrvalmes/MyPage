@@ -7,13 +7,13 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">        
-    <title>Heromovil | HenryValmes</title>
+    <title>HeromovilApp</title>
 </head>
 
 <body>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar close">
         <a href="#" class="logo">
             <i class='bx bx-store-alt'></i>
             <div class="logo-name"><span>Hero</span>Movil</div>
@@ -23,6 +23,7 @@
             <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
             <li><a href="{{ url_for('Mantenimientos') }}"><i class='bx bx-atom'></i>Mantenimientos</a> </li>
             <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-message-square-dots'></i>Comisiones</a></li>
+            <li><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
             <!--<li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
             <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
             <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
@@ -102,21 +103,21 @@
                     <p>Conversion</p>
                 </span>
             </li>
-            <li><i class='bx bx-dollar-circle'></i>
+            <!--<li><i class='bx bx-dollar-circle'></i>
                 <span class="info">
                     <h3 id="comision-value">$0</h3>
                     <p>Comision</p>
                 </span>
-            </li>
+            </li>-->
         </ul>
         <!--Fin tarjetas -->
 
-            <!-- Tabla Ordenes -->
+            <!-- Tabla Ordenes Ventas-->
             <div class="bottom-data">
                 <div class="orders" id="top-empleados">
                     <div class="header">
                         <i class='bx bx-receipt'></i>
-                        <h3>Top10 Pav Ranking</h3>
+                        <h3>Top 10 Pav Ranking Ventas</h3>
                         <!--<i class='bx bx-filter'></i>
                         <i class='bx bx-search'></i>-->
                     </div>
@@ -125,7 +126,7 @@
                             <tr>
                                 <th>Vendedor</th>
                                 <th>Total PAV</th>
-                                <th>Status</th>
+                                <th>Posición</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -169,8 +170,35 @@
                 </div>-->
                 <!-- End of Reminders-->
             </div>
+
+            <!-- Tabla Ordenes Call Center-->
+            <div class="bottom-data">
+                <div class="orders" id="top-empleados-cc">
+                    <div class="header">
+                        <i class='bx bx-receipt'></i>
+                        <h3>Top 10 Vendedor Call Center</h3>
+                        <!--<i class='bx bx-filter'></i>
+                        <i class='bx bx-search'></i>-->
+                    </div>
+                    <table class="greyGridTable">
+                        <thead>
+                            <tr>
+                                <th>Vendedor</th>
+                                <th>Total PAV</th>
+                                <th>Posición</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se llenará dinámicamente con JS -->
+                        </tbody>
+                    </table>
+                </div>            
+                <!-- End of Orders -->                
+            </div>
         </main>
     </div>
+
+
 
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>

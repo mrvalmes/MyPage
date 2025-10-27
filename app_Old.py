@@ -1,7 +1,10 @@
 from flask import Flask, render_template, jsonify, request
 from chart_utils import get_chart_data, get_chart_data_logro
-from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav
+from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, get_rank_pav_cc
+from datetime import timedelta
 import sqlite3
+
+#nota: cn, es la base de datos, cn.py es el archivo que contiene las funciones para conectarse a la base de datos y realizar consultas.
 
 app = Flask(__name__)
 
@@ -96,6 +99,12 @@ def api_topventas():
     top = get_rank_pav()
 
     return jsonify(top)
+
+@app.route("/api/top_ventas_cc")
+def api_topventas_cc():
+    top_cc = get_rank_pav_cc()
+
+    return jsonify(top_cc)
 
 @app.route("/api/incentivos")
 def incentivos():
@@ -412,6 +421,75 @@ def resultados():
 
     return jsonify(data)
 
+@app.route("/api/conversion-rate")
+def api_conversion_rate():
+    # Obtener parámetros del query string
+    empleado_id = request.args.get("empleado_id")  # ID del supervisor o usuario
+    dia = request.args.get("dia")  # Fecha en formato YYYY-MM-DD
+
+    # Validar parámetros
+    if not empleado_id or not dia:
+        return jsonify({"error": "Faltan parámetros: empleado_id y dia son requeridos"}), 400
+
+    # Conexión a la base
+    conn = sqlite3.connect(conect())
+    cur = conn.cursor()
+
+    query = """
+        WITH ventas_por_usuario AS (
+            SELECT
+                usuario_creo_orden,
+                SUBSTR(usuario_creo_orden, 1, 7) AS user_prefix,
+                COUNT(*) AS ventas_count
+            FROM ventas_detalle
+            WHERE tipo_venta != 'Card'
+                AND entity_code != 'EX332'
+                AND DATE(fecha) = DATE(:day)
+                AND supervisor = :supervisor
+            GROUP BY usuario_creo_orden
+        ),
+        pagos_por_prefijo AS (
+            SELECT
+                SUBSTR(userlogin, 1, 7) AS user_prefix,
+                COUNT(*) AS pagos_count
+            FROM pagos
+            WHERE DATE(dte) = DATE(:day)
+            GROUP BY user_prefix
+        )
+        SELECT
+            v.usuario_creo_orden,
+            v.user_prefix,
+            v.ventas_count,
+            IFNULL(p.pagos_count, 0) AS pagos_count,
+            ROUND(
+                CASE 
+                    WHEN p.pagos_count > 0 
+                    THEN (v.ventas_count * 1.0 / p.pagos_count) * 100
+                    ELSE 0
+                END, 2
+            ) AS conversion_rate_pct
+        FROM ventas_por_usuario v
+        LEFT JOIN pagos_por_prefijo p
+        ON v.user_prefix = p.user_prefix
+        ORDER BY conversion_rate_pct DESC;
+    """
+
+    # Parámetros seguros (todo en string o número, nada de funciones)
+    params = {
+        'day': dia,
+        'supervisor': empleado_id
+    }
+
+    cur.execute(query, params)
+    rows = cur.fetchall()
+
+    conn.close()
+
+    # Columnas esperadas
+    columns = ["usuario_creo_orden", "user_prefix", "ventas_count", "pagos_count", "conversion_rate_pct"]
+
+    # Convertir resultados a JSON
+    return jsonify([dict(zip(columns, r)) for r in rows])
 
 if __name__ == "__main__":
     # debug=True para desarrollo

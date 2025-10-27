@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root {
+    --select-light: #eeeeee;    
     --light: #f6f6f9;
     --primary: #1976D2;
     --light-primary: #CFE8FF;
@@ -41,7 +42,8 @@ html{
 body.dark{
     --light: #181a1e;
     --grey: #25252c;
-    --dark: #fbfbfb
+    --dark: #fbfbfb;
+    --select-light: #25252c;
 }
 
 body{
@@ -758,108 +760,57 @@ margin-bottom: 0;
 }
 /*Fin main-chart*/
 
-/*Select Empleados*/
+/*Select*/
 select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    -ms-appearance: none;
-    appearance: none;
-    outline: 0;
-    box-shadow: none;
-    border: 0 !important;
-    background: var(--light);
-    background-image: var(--light);
-    flex: 1;
-    padding: 0 0.5em;
-    color: var(--dark);
-    cursor: pointer;
-    font-size: 1.2em;
-    font-family: "Open Sans", sans-serif;
+    min-inline-size: 14ch;   
+    
+    justify-content: space-between;        
+
+    &, &::picker(select) {
+        appearance: base-select;
+        padding: 1rem;
+        border-radius: 1rem;
+        background-color: var(--select-light);
+        line-height: 1.0;
+        color: var(--dark);                  
+    }
+    &::picker(select) {
+        margin-block-start: 0.5rem; 
+        color: var(--dark);      
+    }    
+    .picker {
+        transition: rotate 0.3s ease;
+        :open & {
+            rotate: 90deg;
+        }        
+    }
+
+    selectedcontent > * {
+        transition: translate 1s var(--spring-easing), opacity 1s;        
+
+        @starting-style {            
+            opacity: 0;
+            translate: 0% 100%;
+        }        
+    }
 }
 
-select::-ms-expand {
-    display: none;
+.selectFiltrar {
+    min-inline-size: 10ch;
+    max-inline-size: 20ch;  
+    inline-size: 15ch;  
+    justify-content: space-between;        
+
+    &, &::picker(select) {
+        appearance: base-select;
+        padding: 0.5rem;
+        border-radius: 1rem;
+        background-color: var(--select-light);
+        line-height: 1.2;
+        color: var(--dark);                  
+    }   
+
 }
-
-.select {
-    position: relative;
-    display: flex;
-    width: 28em;
-    height: 3em;
-    line-height: 3;
-    background: var(--light);
-    overflow: hidden;
-    border-radius: 0.25em;
-}
-
-.select::after {
-    content: "\25BC";
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 0 1em;
-    background: var(--dark-grey);
-    cursor: pointer;
-    pointer-events: none;
-    transition: 0.25s all ease;
-}
-
-.select:hover::after {
-    color: #017efa;
-}
-
-/*select de año*/
-.select_anio {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    -ms-appearance: none;
-    appearance: none;
-    outline: 1;
-    box-shadow: none;
-    border: 0 !important;
-    background: var(--light);
-    background-image: var(--light);
-    flex: 1;
-    padding: 0 0.5em;
-    color: var(--dark);
-    cursor: pointer;
-    font-size: 1.2em;
-    font-family: "Open Sans", sans-serif;
-}
-
-.select_anio::-ms-expand {
-    display: none;
-}
-
-.select_anio {
-    position: relative;
-    display: flex;
-    width: 8em;
-    height: 2em;
-    line-height: 2;
-    background: var(--light);
-    overflow: hidden;
-    border-radius: 0.25em;
-}
-
-
-.select_anio::after {
-    content: "\25BC";
-    position: absolute;
-    top: 0.5;
-    right: 0;
-    padding: 0 0.5em;
-    background: var(--dark-grey);
-    cursor: pointer;
-    pointer-events: none;
-    transition: 0.25s all ease;
-}
-
-.select_anio:hover::after {
-    color: #011afa;
-}
-
-
 
 /* The switch - the box around the slider */
 .switch {
@@ -1007,6 +958,7 @@ input:checked+.slider:before {
 .text {
     margin: 0 1.5em
 }
+
 /*tabla estilo*/
 table.greyGridTable {    
     width: 100%;
@@ -1017,10 +969,11 @@ table.greyGridTable {
 table.greyGridTable td,
 table.greyGridTable th {    
     padding: 3px 4px;
+    text-align: center;
 }
 
 table.greyGridTable tbody td {
-    font-size: 14px;
+    font-size: 14px;    
 }
 
 table.greyGridTable thead {
@@ -1070,3 +1023,206 @@ table.greyGridTable thead th:first-child {
     gap: 5px;    
 }
 
+/* Estilo para el input de fecha */
+input[type="date"] {
+
+  border: 1px solid var(--dark);
+  font-size: 0.9rem;
+  background: var(--light);
+  color: var(--dark);
+  padding: 1.5px;
+  border-radius: 4px;
+
+  &::-webkit-datetime-edit {
+    margin-right: 0.5rem;
+  }
+
+  &::-webkit-datetime-edit-fields-wrapper {
+    background:var(--light);
+    border-radius: 3px;
+    padding: 2px 2px;
+  }
+
+  &::-webkit-datetime-edit-text {
+    color: rgb(83, 113, 168);
+  }
+
+  &::-webkit-datetime-edit-day-field:focus,
+  &::-webkit-datetime-edit-month-field:focus,
+  &::-webkit-datetime-edit-year-field:focus {
+    background: var(--dark-grey);
+  }
+
+  &::-webkit-calendar-picker-indicator {   
+    filter:invert(0);
+  }
+}
+
+/* ===== ESTILOS PARA LA TABLA DE POSICIONES ===== */
+
+/* Esto asume que tu darkMode.js añade la clase 'dark' al body.
+  Si no, puedes quitar el 'body.dark' y aplicar los estilos directamente,
+  pero entonces no funcionará con el modo claro.
+*/
+
+/* Contenedor principal del leaderboard */
+.leaderboard-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Encabezado: "Tabla de Puntuaciones" y logo */
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.leaderboard-header .title-section h2 {
+    color: #FFF; /* Color blanco para el título */
+    font-size: 28px;
+    margin: 0;
+}
+
+.leaderboard-header .title-section p {
+    color: #AAA; /* Color gris para la fecha */
+    font-size: 14px;
+    margin: 0;
+}
+
+.leaderboard-header .event-logo {
+    height: 60px; /* Ajusta el tamaño del logo */
+    width: auto;
+    object-fit: contain;
+}
+
+/* Cuadrícula para las tarjetas de participantes */
+.leaderboard-grid {
+    display: grid;
+    /* 5 columnas por defecto */
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+}
+
+/* Tarjeta individual de participante */
+.participant-card {
+    background-color: #1A1A1A; /* Fondo de tarjeta oscuro */
+    border-radius: 15px;
+    padding: 25px 20px;
+    text-align: center;
+    position: relative;
+    border: 1px solid #333; /* Borde sutil */
+    color: #FFF; /* Texto blanco por defecto */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.participant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Número de posición (esquina superior izquierda) */
+.participant-card .position-number {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #777;
+}
+
+/* Foto de perfil circular */
+.participant-card .profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #444; /* Borde gris por defecto */
+}
+
+/* Bordes de colores para el Top 3 (como en la imagen) */
+.leaderboard-grid .participant-card:nth-child(1) .profile-pic {
+    border-color: #FFD700; /* Oro */
+}
+.leaderboard-grid .participant-card:nth-child(2) .profile-pic {
+    border-color: #C0C0C0; /* Plata */
+}
+.leaderboard-grid .participant-card:nth-child(3) .profile-pic {
+    border-color: #CD7F32; /* Bronce */
+}
+
+
+.participant-card .participant-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.participant-card .participant-points {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.participant-card .points-label {
+    font-size: 12px;
+    color: #AAA;
+    display: block;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+/* Indicador de cambio de posición */
+.participant-card .position-change {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.participant-card .position-change.up {
+    color: #2ECC71; /* Verde */
+}
+
+.participant-card .position-change.down {
+    color: #E74C3C; /* Rojo */
+}
+
+/* ----- Responsividad para la cuadrícula ----- */
+
+/* 4 columnas en pantallas más pequeñas */
+@media (max-width: 1400px) {
+    .leaderboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* 3 columnas en tablets */
+@media (max-width: 992px) {
+    .leaderboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* 2 columnas en tablets pequeñas */
+@media (max-width: 768px) {
+    .leaderboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .leaderboard-header {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+/* 1 columna en móviles */
+@media (max-width: 576px) {
+    .leaderboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

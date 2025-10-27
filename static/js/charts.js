@@ -159,7 +159,7 @@ function fetchAndRenderChart() {
 
       if (mode === "logro" && id !== "None") {
         genericOptions.scales.y.min = 0;
-        genericOptions.scales.y.max = 150;
+        genericOptions.scales.y.max = 250;
         genericOptions.scales.y.ticks.stepSize = 10;
       } else if (mode === "resultados") {
         if (id === "None") {

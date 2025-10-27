@@ -1,101 +1,282 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, g
 from chart_utils import get_chart_data, get_chart_data_logro
-from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav
+from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, get_rank_pav_cc
+from datetime import datetime, timedelta, timezone
 import sqlite3
+import bcrypt
+
+# ======== NUEVO: JWT =========
+from flask_jwt_extended import (
+    JWTManager, create_access_token, get_jwt, get_jwt_identity,
+    jwt_required
+)
 
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = "super-secret-key"   # cámbialo en producción
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)  # token largo, inactividad controla expiración
+jwt = JWTManager(app)
 
+INACTIVITY_SECONDS = 5 * 60  # 5 minutos
+
+
+# ========= DB Helpers =========
+def get_db():
+    if "db" not in g:
+        g.db = sqlite3.connect(conect())
+        g.db.row_factory = sqlite3.Row
+
+    return g.db
+
+@app.teardown_appcontext
+def close_db(_exc):
+    db = g.pop("db", None)
+    if db is not None:
+        db.close()
+
+def init_auth_tables():
+    """Crea tablas de usuarios y sesiones si no existen"""
+    db = get_db()
+    db.executescript("""
+    CREATE TABLE IF NOT EXISTS usuariosligin (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario TEXT NOT NULL UNIQUE,
+        clave_hash TEXT NOT NULL,
+        nivel_acceso TEXT NOT NULL DEFAULT 'viewer',
+        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ultimo_login TIMESTAMP NULL,
+        activo INTEGER DEFAULT 1
+    );
+
+    CREATE TABLE IF NOT EXISTS sesiones (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        jti TEXT NOT NULL UNIQUE,
+        issued_at TEXT NOT NULL,
+        last_seen TEXT NOT NULL,
+        revoked INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (user_id) REFERENCES usuarios(id)
+    );
+    """)
+    db.commit()
+
+@app.before_request
+def boot():
+    if not hasattr(app, "_auth_tables_initialized"):
+        init_auth_tables()
+        app._auth_tables_initialized = True
+
+# ========= Helpers de sesión =========
+def utcnow():
+    return datetime.now(timezone.utc)
+
+def user_by_usuario(usuario: str):
+    db = get_db()
+    return db.execute("SELECT * FROM usuariosligin WHERE usuario = ?", (usuario,)).fetchone()
+
+def set_ultimo_login(user_id: int):
+    db = get_db()
+    db.execute("UPDATE usuariosligin SET ultimo_login = CURRENT_TIMESTAMP WHERE id = ?", (user_id,))
+    db.commit()
+
+def create_or_replace_session(user_id: int, jti: str):
+    db = get_db()
+    # Revoca sesiones previas
+    db.execute("UPDATE sesiones SET revoked=1 WHERE user_id=? AND revoked=0", (user_id,))
+    now = utcnow().isoformat()
+    db.execute("INSERT INTO sesiones (user_id,jti,issued_at,last_seen,revoked) VALUES (?,?,?,?,0)",
+               (user_id, jti, now, now))
+    db.commit()
+
+def get_session_by_jti(jti: str):
+    db = get_db()
+    return db.execute("SELECT * FROM sesiones WHERE jti = ?", (jti,)).fetchone()
+
+def get_active_session_for_user(user_id: int):
+    db = get_db()
+    return db.execute("SELECT * FROM sesiones WHERE user_id=? AND revoked=0 ORDER BY id DESC LIMIT 1",
+                      (user_id,)).fetchone()
+
+def mark_session_revoked(jti: str):
+    db = get_db()
+    db.execute("UPDATE sesiones SET revoked=1 WHERE jti=?", (jti,))
+    db.commit()
+
+def update_last_seen(jti: str):
+    db = get_db()
+    db.execute("UPDATE sesiones SET last_seen=? WHERE jti=?", (utcnow().isoformat(), jti))
+    db.commit()
+
+def seconds_since(dt_iso: str):
+    dt = datetime.fromisoformat(dt_iso)
+    return (utcnow() - dt).total_seconds()
+
+# ========= Decorador de protección =========
+def require_active_single_session(fn):
+    from functools import wraps
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        claims = get_jwt()
+        identity = get_jwt_identity()
+        jti = claims["jti"]
+
+        u = user_by_usuario(identity)
+        if not u or u["activo"] != 1:
+            return jsonify(msg="Usuario no válido"), 401
+
+        s = get_session_by_jti(jti)
+        if not s or s["revoked"] == 1:
+            return jsonify(msg="Sesión inválida"), 401
+
+        active = get_active_session_for_user(u["id"])
+        if not active or active["jti"] != jti:
+            return jsonify(msg="Sesión reemplazada en otro navegador"), 409
+
+        if seconds_since(s["last_seen"]) > INACTIVITY_SECONDS:
+            mark_session_revoked(jti)
+            return jsonify(msg="Sesión expirada por inactividad"), 440
+
+        update_last_seen(jti)
+        return fn(*args, **kwargs)
+    return wrapper
+
+# ========= Rutas de autenticación =========
+@app.post("/login")
+def login():
+    data = request.get_json(silent=True) or {}
+    usuario = (data.get("email") or data.get("usuario") or "").strip()
+    password = (data.get("password") or "").encode("utf-8")
+
+    u = user_by_usuario(usuario)
+    if not u or u["activo"] != 1:
+        return jsonify(msg="Credenciales inválidas"), 401
+
+    if not bcrypt.checkpw(password, u["clave_hash"].encode("utf-8")):
+        return jsonify(msg="Credenciales inválidas"), 401
+
+    access_token = create_access_token(identity=usuario,
+                                       additional_claims={"nivel": u["nivel_acceso"]})
+
+    # obtener jti del token
+    from flask_jwt_extended.utils import decode_token
+    jti = decode_token(access_token)["jti"]
+
+    create_or_replace_session(u["id"], jti)
+    set_ultimo_login(u["id"])
+
+    return jsonify(access_token=access_token, nivel=u["nivel_acceso"])
+
+@app.post("/logout")
+#@jwt_required()
+#@require_active_single_session
+def logout():
+    jti = get_jwt()["jti"]
+    mark_session_revoked(jti)
+    return jsonify(msg="Sesión cerrada")
+
+@app.get("/me")
+#@jwt_required()
+#@require_active_single_session
+def me():
+    identity = get_jwt_identity()
+    claims = get_jwt()
+    return jsonify(usuario=identity, nivel=claims.get("nivel"))
+
+@app.post("/ping")
+#@jwt_required()
+#@require_active_single_session
+def ping():
+    return jsonify(ok=True)
+
+# ========= rutas  =========
 @app.route("/")
 def index():
-    # Renderiza tu archivo index.html
     return render_template("login.html")
 
 @app.route("/home")
+#@jwt_required()
+#@require_active_single_session
 def home():
-    # Renderiza reportes.html
     return render_template("Home.html")
 
+@app.route("/Registro")
+#@jwt_required()
+#@require_active_single_session
+def registro():
+    return render_template("registro.html")
+
 @app.route("/dashboard")
+#@jwt_required()
+#@require_active_single_session
 def dashboard():
-    # Renderiza dashboard.html
     return render_template("dashboard.html")
 
 @app.route("/Mantenimientos")
+#@jwt_required()
+#@require_active_single_session
 def Mantenimientos():
-    # Renderiza dashboard.html
     return render_template("Mantenimientos.html")
 
 @app.route("/Comisiones")
+#@jwt_required()
+#@require_active_single_session
 def Comisiones():
-    # Renderiza dashboard.html
     return render_template("Comisiones.html")
 
+@app.route("/posiciones")
+#@jwt_required()
+#@require_active_single_session
+def posiciones():
+    return render_template("posiciones.html")
+
+# === APIs ===
+# Puedes decidir si quieres que estas sean públicas o privadas
 @app.route("/chart-data")
 def chart_data():
     anio = request.args.get("anio", "2025")
-    empleado_id = request.args.get("empleado")  # None si no viene
-    supervisor_id = request.args.get("supervisor")  # None si no viene
+    empleado_id = request.args.get("empleado")
+    supervisor_id = request.args.get("supervisor")
     modo = request.args.get("modo")
 
-    # Si 'empleado_id' es "None" (cadena) o está vacío, conviértelo a None real:
     if not empleado_id or empleado_id.lower() == "none":
         empleado_id = None
-
     if not supervisor_id or supervisor_id.lower() == "none":
         supervisor_id = None
-
     if not modo or modo.lower() == "none":
         modo = "resultados"
 
     if modo == "logro":
         data = get_chart_data_logro(conect(), anio, empleado_id, supervisor_id)
-
-    elif modo == "resultados":
+    else:
         data = get_chart_data(conect(), anio, empleado_id, supervisor_id)
 
     return jsonify(data)
 
-# falta crear la validacion, del tipo de reporte a solicitar/crear
 @app.route("/api/empleados")
 def api_empleados():
     rows = empleados()
-
-    # rows es como [(1016312, 'JENS PYDDE'), (1013794, 'CARINA...'), ...]
-    empleado_id = []
-    for r in rows:
-        empleado_id.append({"id": r[0], "nombre": r[1]})
-
-    return jsonify(empleado_id)
+    return jsonify([{"id": r[0], "nombre": r[1]} for r in rows])
 
 @app.route("/api/supervisor")
 def api_supervisor():
     rows = supervisor()
-
-    # rows es como [(1016312, 'JENS PYDDE'), (1013794, 'CARINA...'), ...]
-    super_id = []
-    for r in rows:
-        super_id.append({"id": r[0], "nombre": r[1]})
-
-    return jsonify(super_id)
+    return jsonify([{"id": r[0], "nombre": r[1]} for r in rows])
 
 @app.route("/api/pagos")
 def api_pagos():
-    empleado_id = request.args.get("empleado_id")  # p.ej. "1016312"
-    pagos_total = pagos(empleado_id)
-
-    return jsonify({"pagos": pagos_total})
+    empleado_id = request.args.get("empleado_id")
+    return jsonify({"pagos": pagos(empleado_id)})
 
 @app.route("/api/pav")
 def api_pav():
-    pav_total = get_ventas()
-
-    return jsonify({"pav": pav_total})
+    return jsonify({"pav": get_ventas()})
 
 @app.route("/api/top_ventas")
 def api_topventas():
-    top = get_rank_pav()
+    return jsonify(get_rank_pav())
 
-    return jsonify(top)
+@app.route("/api/top_ventas_cc")
+def api_topventas_cc():
+    return jsonify(get_rank_pav_cc())
 
 @app.route("/api/incentivos")
 def incentivos():
@@ -412,7 +593,101 @@ def resultados():
 
     return jsonify(data)
 
+@app.route("/api/conversion-rate")
+def api_conversion_rate():
+    # Obtener parámetros del query string
+    empleado_id = request.args.get("empleado_id")  # ID del supervisor o usuario
+    dia = request.args.get("dia")  # Fecha en formato YYYY-MM-DD
+
+    # Validar parámetros
+    if not empleado_id or not dia:
+        return jsonify({"error": "Faltan parámetros: empleado_id y dia son requeridos"}), 400
+
+    # Conexión a la base
+    conn = sqlite3.connect(conect())
+    cur = conn.cursor()
+
+    query = """
+        WITH ventas_por_usuario AS (
+            SELECT
+                usuario_creo_orden,
+                SUBSTR(usuario_creo_orden, 1, 7) AS user_prefix,
+                SUM(total_ventas) AS ventas_count
+            FROM ventas_detalle
+            WHERE tipo_venta != 'Card'
+                AND entity_code != 'EX332'
+                AND DATE(fecha) = DATE(:day)
+                AND supervisor = :supervisor
+            GROUP BY usuario_creo_orden
+        ),
+        pagos_por_prefijo AS (
+            SELECT
+                SUBSTR(userlogin, 1, 7) AS user_prefix,
+                COUNT(*) AS pagos_count
+            FROM pagos
+            WHERE DATE(dte) = DATE(:day)
+            GROUP BY user_prefix
+        )
+        SELECT
+            v.usuario_creo_orden,
+            v.user_prefix,
+            v.ventas_count,
+            IFNULL(p.pagos_count, 0) AS pagos_count,
+            ROUND(
+                CASE 
+                    WHEN p.pagos_count > 0 
+                    THEN (v.ventas_count * 1.0 / p.pagos_count) * 100
+                    ELSE 0
+                END, 2
+            ) AS conversion_rate_pct
+        FROM ventas_por_usuario v
+        LEFT JOIN pagos_por_prefijo p
+        ON v.user_prefix = p.user_prefix
+        ORDER BY conversion_rate_pct DESC;
+    """
+
+    # Parámetros seguros (todo en string o número, nada de funciones)
+    print("Parámetros recibidos:", empleado_id, dia)
+    params = {
+        'day': dia,
+        'supervisor': empleado_id
+    }
+
+    cur.execute(query, params)
+    rows = cur.fetchall()
+
+    conn.close()
+
+    # Columnas esperadas
+    columns = ["usuario_creo_orden", "user_prefix", "ventas_count", "pagos_count", "conversion_rate_pct"]
+
+    # Convertir resultados a JSON
+    return jsonify([dict(zip(columns, r)) for r in rows])
+
+@app.post("/api/register")
+def register():
+    data = request.get_json(silent=True) or {}
+    usuario = (data.get("usuario") or "").strip()
+    password = (data.get("password") or "").encode("utf-8")
+    nivel = (data.get("nivel") or "viewer").strip()
+
+    if not usuario or not password:
+        return jsonify(msg="Usuario y contraseña requeridos"), 400
+
+    # Hashear clave
+    clave_hash = bcrypt.hashpw(password, bcrypt.gensalt()).decode("utf-8")
+
+    db = get_db()
+    try:
+        db.execute(
+            "INSERT INTO usuariosligin (usuario, clave_hash, nivel_acceso) VALUES (?, ?, ?)",
+            (usuario, clave_hash, nivel)
+        )
+        db.commit()
+    except sqlite3.IntegrityError:
+        return jsonify(msg="Usuario ya existe"), 409
+
+    return jsonify(msg="Usuario creado correctamente"), 201
 
 if __name__ == "__main__":
-    # debug=True para desarrollo
     app.run(debug=True)

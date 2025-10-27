@@ -10,12 +10,12 @@
     <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modalStyle.css') }}">
-    <title>Heromovil | HenryValmes</title>
+    <title>HeromovilApp</title>
 </head>
 
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar close">
         <a href="#" class="logo">
             <i class='bx bx-store-alt'></i>
             <div class="logo-name"><span>Hero</span>Movil</div>
@@ -25,6 +25,7 @@
             <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
             <li class="active"><a href="{{ url_for('Mantenimientos') }}"><i class='bx bx-atom'></i>Mantenimientos</a> </li>
             <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-message-square-dots'></i>Comisiones</a></li>
+            <li><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
             <!--<li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
             <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
             <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>-->
@@ -33,7 +34,7 @@
             <li>
                 <a href="{{ url_for('index') }}" class="logout">
                     <i class='bx bx-log-out-circle'></i>
-                    Logout
+                    Salir
                 </a>
             </li>
         </ul>
@@ -48,7 +49,7 @@
 
             <form action="#">
                 <div class="form-input">
-                    <input type="search" placeholder="Search...">
+                    <input type="search" placeholder="Buscar...">
                     <button class="search-btn" type="submit"><i class='bx bx-search'></i></button>
                 </div>
             </form>
@@ -69,13 +70,13 @@
         <main>
             <div class="header">
                 <div class="left">
-                    <h1>Dashboard</h1>
+                    <h1>Mantenimientos</h1>
                     <ul class="breadcrumb">
                         <li><a href="#">
-                                Analiticas
+                                Opciones
                             </a></li>
                         /
-                        <li><a href="#" class="active">Ventas</a></li>
+                        <li><a href="#" class="active">Miselaneos</a></li>
                     </ul>
                 </div>
                 <!--<a href="#" class="report">

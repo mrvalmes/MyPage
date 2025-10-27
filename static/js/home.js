@@ -7,13 +7,13 @@ function cargarDatos() {
     // 1) Llamamos las dos APIs en paralelo
     Promise.all([
         fetch('/api/empleados'),
-        fetch('/api/supervisor')
+        fetch('/api/supervisor'),
     ])
         .then(([respEmpleados, respSupervisores]) => {
             // 2) Convertimos ambas respuestas a JSON
             return Promise.all([
                 respEmpleados.json(),
-                respSupervisores.json()
+                respSupervisores.json(),
             ]);
         })
         .then(([listaEmpleados, listaSupervisores]) => {
@@ -21,7 +21,7 @@ function cargarDatos() {
             selectEmpleado.innerHTML = '';
             const optDefaultEmp = document.createElement('option');
             optDefaultEmp.value = "";
-            optDefaultEmp.textContent = "Selecciona Empleado";
+            optDefaultEmp.textContent = "-- Seleccione Vendedor --";
             selectEmpleado.appendChild(optDefaultEmp)
 
             listaEmpleados.forEach(emp => {
@@ -35,7 +35,7 @@ function cargarDatos() {
             selectSupervisor.innerHTML = '';
             const optDefaultSup = document.createElement('option');
             optDefaultSup.value = "";
-            optDefaultSup.textContent = "Selecciona Supervisor";
+            optDefaultSup.textContent = "-- Seleccione Supervisor --";
             selectSupervisor.appendChild(optDefaultSup);
 
             listaSupervisores.forEach(sup => {
