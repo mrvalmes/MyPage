@@ -110,6 +110,8 @@ def get_rank_pav():
         SUM(total_ventas) AS total_ventas
     FROM ventas_detalle
     WHERE tipo_venta != 'Card'
+    AND tipo_venta != 'CardEquipo'
+    AND tipo_venta != 'InternetCard'
     AND entity_code  != 'EX332'
     AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
     AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')

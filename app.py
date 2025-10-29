@@ -4,6 +4,7 @@ from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, g
 from datetime import datetime, timedelta, timezone
 import sqlite3
 import bcrypt
+import json
 
 # ======== NUEVO: JWT =========
 from flask_jwt_extended import (
@@ -279,6 +280,13 @@ def api_topventas():
 @app.route("/api/top_ventas_cc")
 def api_topventas_cc():
     return jsonify(get_rank_pav_cc())
+
+@app.route('/api/update_positions', methods=['POST'])
+def update_positions():
+    new_data = request.get_json()
+    with open('static/data/positions.json', 'w') as f:
+        json.dump(new_data, f)
+    return jsonify(success=True)
 
 @app.route("/api/incentivos")
 def incentivos():

@@ -37,6 +37,27 @@ document.addEventListener('DOMContentLoaded', () => {
     { claveRes: "Aumentos" }
   ];
 
+  const pagosUrl = "/api/pagos?empleado_id=None";
+  const pavUrl = "/api/pav";
+
+      // Cargar datos principales en paralelo: PAV , CLIENTES Y CR General.
+    Promise.all([
+        fetch(pagosUrl).then(r => r.json()),
+        fetch(pavUrl).then(r => r.json())
+    ])
+    .then(([dataPagos, dataPav]) => {
+        const totalpagos = dataPagos.pagos || 0;
+        const totalpav = dataPav.pav || 0;
+
+        document.getElementById("clientes-value").textContent = totalpagos.toLocaleString('en-US');
+        document.getElementById("pav-value").textContent = totalpav.toLocaleString('en-US');
+
+        const cr = totalpagos ? ((totalpav / totalpagos) * 100).toFixed(1) : 0;
+        document.getElementById("conversion-value").textContent = cr + '%';
+    })
+    .catch(err => console.error("Error fetch métricas:", err));
+
+
   const selects = document.querySelectorAll('#employeeSelect, #supervisoreSelect');
 
   selects.forEach(sel => {    
@@ -55,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ])
       .then(([pagosData, objetivosData]) => {
         const pagos = pagosData.pagos || 0;
-        document.getElementById("clientes-value").textContent = pagos;
+        document.getElementById("clientes-value").textContent = pagos.toLocaleString('en-US');
 
         const objetivos = objetivosData.objetivos || {};
         const resultados = objetivosData.resultados || {};

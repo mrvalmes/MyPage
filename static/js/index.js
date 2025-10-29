@@ -37,7 +37,7 @@ function renderTopVentas(tableSelector, data) {
 document.addEventListener("DOMContentLoaded", function () {
     const pagosUrl = "/api/pagos?empleado_id=None";
     const pavUrl = "/api/pav";
-    const topVentasUrl = "/api/top_ventas";
+    //const topVentasUrl = "/api/top_ventas";
     const topVentasCCUrl = "/api/top_ventas_cc";
 
     // Cargar datos principales en paralelo
@@ -49,19 +49,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const totalpagos = dataPagos.pagos || 0;
         const totalpav = dataPav.pav || 0;
 
-        document.getElementById("clientes-value").textContent = totalpagos;
-        document.getElementById("pav-value").textContent = totalpav;
+        document.getElementById("clientes-value").textContent = totalpagos.toLocaleString('en-US');
+        document.getElementById("pav-value").textContent = totalpav.toLocaleString('en-US');
 
         const cr = totalpagos ? ((totalpav / totalpagos) * 100).toFixed(1) : 0;
         document.getElementById("conversion-value").textContent = cr + '%';
     })
     .catch(err => console.error("Error fetch métricas:", err));
 
-    // Cargar top ventas normal
+    /* Cargar top ventas normal
     fetch(topVentasUrl)
         .then(r => r.ok ? r.json() : Promise.reject('Error en top_ventas'))
         .then(data => renderTopVentas('#top-empleados', data))
-        .catch(err => console.error(err));
+        .catch(err => console.error(err));*/
 
     // Cargar top ventas CC
     fetch(topVentasCCUrl)
