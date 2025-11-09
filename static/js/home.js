@@ -1,51 +1,112 @@
+document.addEventListener('DOMContentLoaded', function () {
 
-// Obtener empleados
-const selectEmpleado = document.getElementById('employeeSelect');
-const selectSupervisor = document.getElementById('supervisoreSelect');
-
-function cargarDatos() {
-    // 1) Llamamos las dos APIs en paralelo
-    Promise.all([
-        fetch('/api/empleados'),
-        fetch('/api/supervisor'),
-    ])
-        .then(([respEmpleados, respSupervisores]) => {
-            // 2) Convertimos ambas respuestas a JSON
-            return Promise.all([
-                respEmpleados.json(),
-                respSupervisores.json(),
-            ]);
-        })
-        .then(([listaEmpleados, listaSupervisores]) => {
-            // 3) Llenar el dropdown de empleados
-            selectEmpleado.innerHTML = '';
-            const optDefaultEmp = document.createElement('option');
-            optDefaultEmp.value = "";
-            optDefaultEmp.textContent = "-- Seleccione Vendedor --";
-            selectEmpleado.appendChild(optDefaultEmp)
-
-            listaEmpleados.forEach(emp => {
-                const option = document.createElement('option');
-                option.value = emp.id;       // ID único
-                option.textContent = emp.nombre; // Nombre del empleado
-                selectEmpleado.appendChild(option);
+    function fetchRecentActivity() {
+        fetch('/api/recent-activity')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const recentActivityList = document.querySelector('.orders ul');
+                if (recentActivityList) {
+                    recentActivityList.innerHTML = ''; // Limpiar lista existente
+                    if (data && data.length > 0) {
+                        data.forEach(activity => {
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('task-list');
+                            
+                            const taskTitle = document.createElement('div');
+                            taskTitle.classList.add('task-title');
+                            
+                            const paragraph = document.createElement('p');                            
+                            paragraph.textContent = `${activity[0]}: ${activity[1]}`;
+                            
+                            taskTitle.appendChild(paragraph);
+                            listItem.appendChild(taskTitle);
+                            recentActivityList.appendChild(listItem);
+                        });
+                    } else {
+                        recentActivityList.innerHTML = '<li class="task-list"><div class="task-title"><p>No hay actividad reciente.</p></div></li>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching recent activity:', error);
+                const recentActivityList = document.querySelector('.orders ul');
+                if (recentActivityList) {
+                    recentActivityList.innerHTML = '<li class="task-list"><div class="task-title"><p>Error al cargar la actividad.</p></div></li>';
+                }
             });
+    }
 
-            // 4) Llenar el dropdown de supervisores
-            selectSupervisor.innerHTML = '';
-            const optDefaultSup = document.createElement('option');
-            optDefaultSup.value = "";
-            optDefaultSup.textContent = "-- Seleccione Supervisor --";
-            selectSupervisor.appendChild(optDefaultSup);
+    let salesChart = null; // variable global
 
-            listaSupervisores.forEach(sup => {
-                const option = document.createElement('option');
-                option.value = sup.id;        // ID único
-                option.textContent = sup.nombre; // Nombre del supervisor
-                selectSupervisor.appendChild(option);
-            });
-        })
-        .catch(error => console.error("Error al cargar datos:", error));
-}
-// Llamar la función al cargar la página
-cargarDatos()
+    function fetchSalesOverview() {
+        fetch('/api/sales-overview')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(salesOverviewData => {
+                const ctx = document.getElementById('salesOverviewChart').getContext('2d');
+
+                if (salesChart) {
+                    salesChart.destroy();
+                }
+
+                if (!salesOverviewData || !salesOverviewData.data || salesOverviewData.data.length === 0) {
+                    console.warn("Sin datos para el gráfico de Overview.");
+                    return;
+                }
+
+                salesChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: salesOverviewData.labels,
+                        datasets: [{
+                            label: 'Sales Overview',
+                            data: salesOverviewData.data,
+                            backgroundColor: [
+                                '#FF6384',
+                                '#36A2EB',
+                                '#FFCE56',
+                                '#4BC0C0',
+                                '#A236EB',
+                                '#FF9F40'
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,                        
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) label += ': ';
+                                        if (context.parsed !== null) {
+                                            label += context.parsed.toFixed(2) + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching sales overview:', error));
+    }
+
+    fetchRecentActivity();
+    fetchSalesOverview();
+});

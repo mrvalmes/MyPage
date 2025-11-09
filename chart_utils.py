@@ -13,32 +13,7 @@ def get_chart_data(db_path, anio="2025", empleado_id=None, supervisor_id=None):
       SUM(total_ventas) AS total
     FROM ventas_detalle
     WHERE strftime('%Y', fecha) = ?
-    AND usuario_creo_orden != '1018707 - FRANCHEZCA CID'
-    AND usuario_creo_orden != '1003697 - JUAN THOMAS  MOREL'
-    AND usuario_creo_orden != '1016312 - JENS PYDDE'
-    AND usuario_creo_orden != '1016896 - MARTIN ELIAS BONE OZUNA'
-    AND usuario_creo_orden != '1025954 - MADELIN CASTILLO GUZMAN'
-    AND usuario_creo_orden != '1013843 - JUAN CARLOS GRULLON GARCIA'
-    AND usuario_creo_orden != '1018294 - MARIA VANESSA MOSQUEA ABAD'
-    AND usuario_creo_orden != '1025881 - ANYELINA MUÑOZ GARCIA'
-    AND usuario_creo_orden != '1026089 - ALEJANDRA ROSARIO ARIAS'
-    AND usuario_creo_orden != '1018784 - KANDY PENELOPE JIMENEZ JIMENEZ'
-    AND usuario_creo_orden != '2025551 - ANGEL NOEL CAMPOS LORA'
-    AND usuario_creo_orden != '1025674 - ROLANDO PICHARDO DISLA'
-    AND usuario_creo_orden != '1013437 - ANABEL MARTE'
-    AND usuario_creo_orden != '1026105 - ANATHAI NAHIRET DISLA FELIZ'
-    AND usuario_creo_orden != '1025955 - ANGEL GABRIEL ENCARNACION TAUIL'
-    AND usuario_creo_orden != '1025677 - MAURIFE MATEO PEÑA'
-    AND usuario_creo_orden != '1003794 - CARINA DE LA CRUZ CASTILLO'
-    AND usuario_creo_orden != '1025879 - LEONELA MARIA HOLDER ALVAREZ'
-    AND usuario_creo_orden != '1025880 - LUISA MARIBEL TEJEDA DE SANTANA'
-    AND usuario_creo_orden != '1025676 - MARIA LUISA DELGADO DE LA CRUZ'
-    AND usuario_creo_orden != '1026104 - LAURA MARINA CONTRERAS MEDINA'
-    AND usuario_creo_orden != '1025878 - BRANDY JULEICY ARIAS'
-    AND usuario_creo_orden != '1026186 - MADELIN REYES'
-    AND usuario_creo_orden != '1026184 - ESMIRNA EBENESER ESPEGUE CAYETANO'
-    AND usuario_creo_orden != '1026187 - NICOLE DE LA CRUZ CORDERO'
-    AND usuario_creo_orden != '1026185 - LETICIA LIZARANZO GALAN'
+    AND entity_code != 'EX332'
     """
     params = [anio]
 
@@ -54,7 +29,6 @@ def get_chart_data(db_path, anio="2025", empleado_id=None, supervisor_id=None):
     GROUP BY tipo_venta, mes
     ORDER BY tipo_venta, mes
     """
-
     print(query)
     print(params)
 

@@ -16,16 +16,16 @@ function actualizarEscala() {
 //opciones genéricas
 const genericOptions = {
   responsive: true,
-  hoverBackgroundColor: 'white',
-  hoverRadius: 7,
+  hoverBackgroundColor: 'black',
+  hoverRadius: 6,
   hoverBorderWidth: 3,
   onHover: { mode: ['dataset', 'tooltip'] },
   scales: {
-    x: { grid: { display: false } },
+    x: { grid: { display: true } },
     y: {
       min: 0,
       max: 50,
-      ticks: { stepSize: 5 },
+      ticks: { stepSize: 10 },
       grid: { borderDash: [5, 5] }
     }
   },
@@ -43,10 +43,10 @@ const genericOptions = {
   plugins: {
     legend: { display: false },
     tooltip: {
-      padding: 16,
+      padding: 15,
       titleFont: {
         family: "'Poppins', 'sans-serif'",
-        size: 16,
+        size: 15,
         weight: 'normal'
       },
       backgroundColor: 'rgba(8, 26, 81, 1)',
@@ -108,7 +108,7 @@ const lineDash = {
       ctx.moveTo(activePoint.element.x, chart.chartArea.top);
       ctx.lineTo(activePoint.element.x, chart.chartArea.bottom);
       ctx.lineWidth = 1.5;
-      ctx.strokeStyle = 'rgba(1, 126, 250, 0.8)';
+      ctx.strokeStyle = 'rgba(1, 88, 250, 0.8)';
       ctx.stroke();
       ctx.restore();
     }
@@ -130,12 +130,12 @@ function fetchAndRenderChart() {
 
   // Limpiar el otro selector cuando uno es seleccionado
   if (supervisorId && supervisorId !== "None") {
-    employeeSelect.value = "None"; // Limpiar la selección de empleado
+    //employeeSelect.value = "None"; // Limpiar la selección de empleado
     url += `&supervisor=${encodeURIComponent(supervisorId)}&modo=${mode}`;    
     id = supervisorId;
 
   } else if (empleadoId && empleadoId !== "None") {
-    supervisoreSelect.value = "None"; // Limpiar la selección de supervisor
+    //supervisoreSelect.value = "None"; // Limpiar la selección de supervisor
     url += `&empleado=${encodeURIComponent(empleadoId)}&modo=${mode}`;    
     id = empleadoId; 
 
@@ -196,18 +196,19 @@ function fetchAndRenderChart() {
           // Obtener el label del filtro seleccionado
           const selectedLabel = filter.getAttribute('data-label');
 
-          if (selectedLabel === 'Todos') {
-            // Mostrar todos los datasets
-            chartMain.data.datasets.forEach(dataset => {
-              dataset.hidden = false;
-            });
-          } else {
-            // Filtrar los datasets para mostrar solo el seleccionado
-            chartMain.data.datasets.forEach(dataset => {
-              dataset.hidden = dataset.label !== selectedLabel;
-              genericOptions.scales.y.max = dataset.value; // Escalar grafico al valor maximo del filtro seleccionado.              
-            });
-          }
+          let maxDataValue = 0;
+          chartMain.data.datasets.forEach(dataset => {
+            const isVisible = selectedLabel === 'Todos' || dataset.label === selectedLabel;
+            dataset.hidden = !isVisible;
+            if (isVisible) {
+              const maxInDataset = Math.max(...dataset.data);
+              if (maxInDataset > maxDataValue) {
+                maxDataValue = maxInDataset;
+              }
+            }
+          });
+
+          chartMain.options.scales.y.max = maxDataValue > 0 ? Math.ceil(maxDataValue * 1.1) : 100;
           chartMain.update();
         });
       });

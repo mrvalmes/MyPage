@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
       data.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${escapeHtml(row.usuario_creo_orden)}</td>
+          <td>${escapeHtml(row.usuario_creo_orden.substring(10))}</td>
           <td>${escapeHtml(row.ventas_count)}</td>
           <td>${escapeHtml(row.pagos_count)}</td>
           <td>${escapeHtml(row.conversion_rate_pct)}%</td>

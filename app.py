@@ -1,10 +1,12 @@
 from flask import Flask, render_template, jsonify, request, g
 from chart_utils import get_chart_data, get_chart_data_logro
-from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, get_rank_pav_cc
+from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, get_rank_pav_cc, guardar_filtrado_en_db, get_recent_activity, get_sales_overview
+import gestiondata
 from datetime import datetime, timedelta, timezone
 import sqlite3
 import bcrypt
 import json
+import pandas as pd
 
 # ======== NUEVO: JWT =========
 from flask_jwt_extended import (
@@ -197,7 +199,9 @@ def index():
 #@jwt_required()
 #@require_active_single_session
 def home():
-    return render_template("Home.html")
+    recent_activity = get_recent_activity()
+    sales_overview = get_sales_overview()
+    return render_template("Home.html", recent_activity=recent_activity, sales_overview=sales_overview)
 
 @app.route("/Registro")
 #@jwt_required()
@@ -228,6 +232,12 @@ def Comisiones():
 #@require_active_single_session
 def posiciones():
     return render_template("posiciones.html")
+
+@app.route("/procesos")
+#@jwt_required()
+#@require_active_single_session
+def procesos():
+    return render_template("procesos.html")
 
 # === APIs ===
 # Puedes decidir si quieres que estas sean públicas o privadas
@@ -273,13 +283,25 @@ def api_pav():
 
 @app.route("/api/top_ventas")
 def api_topventas():
-    top_ventas_data = get_rank_pav()
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    top_ventas_data = get_rank_pav(start_date=start_date, end_date=end_date)
     formatted_data = [{"nombre": row[0], "total_pav": row[1]} for row in top_ventas_data]
     return jsonify(formatted_data)
 
 @app.route("/api/top_ventas_cc")
 def api_topventas_cc():
     return jsonify(get_rank_pav_cc())
+
+@app.route("/api/recent-activity")
+def api_recent_activity():    
+    activity = get_recent_activity()
+    return jsonify(activity)
+
+@app.route("/api/sales-overview")
+def api_sales_overview():
+    overview = get_sales_overview()
+    return jsonify(overview)
 
 @app.route('/api/update_positions', methods=['POST'])
 def update_positions():
@@ -292,9 +314,19 @@ def update_positions():
 def incentivos():
     try:
         empleado_id = request.args.get("empleado_id")
+        selected_month = request.args.get("month")
+        current_year = datetime.now().year
+        selected_year = request.args.get("year", default=current_year)
 
         if not empleado_id:
             return jsonify({"error": "Falta empleado_id"}), 400
+
+        # Crear el filtro de fecha
+        if selected_month:
+            month_str = f"{int(selected_month):02d}"
+            year_month_filter = f"{selected_year}-{month_str}"
+        else:
+            year_month_filter = datetime.now().strftime('%Y-%m')
 
         conn = sqlite3.connect(conect())
         cur = conn.cursor()
@@ -308,11 +340,11 @@ def incentivos():
                aumentos_plan_pos_net
         FROM objetivos
         WHERE id_empleado = ?
-          AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
+          AND strftime('%Y-%m', fecha) = ?
         ORDER BY fecha DESC
         LIMIT 1
         """
-        cur.execute(sql_objetivos, (empleado_id,))
+        cur.execute(sql_objetivos, (empleado_id, year_month_filter))
         row_obj = cur.fetchone()
 
         objetivos = {}
@@ -339,11 +371,11 @@ def incentivos():
             COALESCE(SUM(Comision_75), 0) as comision_75_total,
             COALESCE(SUM(Comision_100), 0) as comision_100_total
         FROM ventas_detalle
-        WHERE strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
+        WHERE strftime('%Y-%m', fecha) = ?
         AND (usuario_creo_orden LIKE ? OR supervisor = ?)
         GROUP BY tipo_venta;
         """
-        cur.execute(sql_resultados_comisiones, (like_pattern, empleado_id))
+        cur.execute(sql_resultados_comisiones, (year_month_filter, like_pattern, empleado_id))
         rows_res_com = cur.fetchall()
         conn.close()
 
@@ -698,6 +730,26 @@ def register():
         return jsonify(msg="Usuario ya existe"), 409
 
     return jsonify(msg="Usuario creado correctamente"), 201
+
+@app.route('/api/upload_ventas', methods=['POST'])
+def upload_ventas():
+    if 'ventas_excel' not in request.files:
+        return jsonify(success=False, error='No se encontró el archivo')
+
+    file = request.files['ventas_excel']
+
+    if file.filename == '':
+        return jsonify(success=False, error='No se seleccionó ningún archivo')
+
+    if file and file.filename.endswith('.xlsx'):
+        try:
+            df = pd.read_excel(file)
+            gestiondata.procesar_dataframe_ventas(df)
+            return jsonify(success=True)
+        except Exception as e:
+            return jsonify(success=False, error=str(e))
+    else:
+        return jsonify(success=False, error='Formato de archivo no válido. Use .xlsx')
 
 if __name__ == "__main__":
     app.run(debug=True)

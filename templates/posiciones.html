@@ -23,6 +23,7 @@
             <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
             <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
             <li class="active"><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
+            <li><a href="{{ url_for('procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
         </ul>
         <ul class="side-menu">
             <li>
@@ -79,6 +80,13 @@
                     <div class="title-section">
                         <h2>Tabla de Posiciones</h2>
                         <p id="current-date"></p>
+                    </div>
+                    <div class="date-filter">
+                        <label for="start-date">Fecha Inicio:</label>
+                        <input type="date" id="start-date">
+                        <label for="end-date">Fecha Fin:</label>
+                        <input type="date" id="end-date">                        
+                        <i id="btnBuscar" class='bx bx-search'></i>                        
                     </div>
                     <!--<div class="logo-section">
                         <img src="/static/images/1003779.jpg" alt="La Caba" class="event-logo">

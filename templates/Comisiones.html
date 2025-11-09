@@ -25,6 +25,7 @@
             <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
             <li class="active"><a href="{{ url_for('Comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
             <li><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
+            <li><a href="{{ url_for('procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
             <!--<li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
             <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>-->
         </ul>
@@ -88,15 +89,44 @@
             <div class="bottom-data">
                 <div class="orders" id="incentivo">
                     <div class="header">
+
                         <i class='bx bx-receipt'></i>
                         <h3>Incentivos</h3>
+                        
                         <div class="select">
-                            <select id="employeeSelect">
+                            <select id="employeeSelect"> <!-- Selector de Empleado -->
                                 <option value="None" selected>Selecciona Empleado</option>                                
                             </select>
                         </div> 
-                        <!--<i class='bx bx-filter'></i>
-                        <i class='bx bx-search'></i>-->
+
+                        <div class="select">
+                            <select id="YearSelect">  <!-- Selector de Año -->
+                                <option value="2024">2024</option>
+                                <option value="2025" selected>2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+
+                        <div class="select">
+                            <select id="MonthSelect">  <!-- Selector de Mes -->
+                                <option value="" selected>Seleccione Mes</option>  
+                                <option value="1">Enero</option>
+                                <option value="2">Febrero</option>
+                                <option value="3">Marzo</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Mayo</option>
+                                <option value="6">Junio</option>
+                                <option value="7">Julio</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Septiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>    
+                                <option value="12">Diciembre</option>                            
+                            </select>
+                        </div> 
+
+                        <i id="btnBuscar" class='bx bx-search'></i> <!-- Boton Buscar -->
+
                     </div>
                     <table class="greyGridTable">
                         <thead>
@@ -119,20 +149,16 @@
                                 <th>
                                     <h2>Incentivo 100%</h2>
                                 </th>
+                                <th>
+                                    <h2>Totales</h2>
+                                </th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>               
             </div>
-            <!-- tabla empleados -->
-             
-            <!-- Datos Generales 
-            <div class="bottom-data">
-                <div class="orders">                
-                    
-                </div>
-            </div>-->            
+            <!-- tabla empleados -->    
         </main>
 
     </div>          

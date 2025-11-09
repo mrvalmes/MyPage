@@ -25,6 +25,7 @@
       <li class="active"><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
       <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
       <li><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
+      <li><a href="{{ url_for('procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
       <!--<li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
             <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
             <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
@@ -234,17 +235,6 @@
                   <option value="logro">Logro</option>
                 </select>
               </div>
-              <!--<input id="maxInput" type="number" placeholder="Escala" class="input" value="85">
-                        <input id="stepInput" type="number" placeholder="Rango" class="input" value="5">
-                        <button class="buttongo" onclick="actualizarEscala()">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"></path>
-                            </svg>
-                            <div class="text">
-                                Actualizar Escala
-                            </div>
-                        </button> -->
             </div>
             <header>
               <div class="wrapper-reach">
@@ -299,7 +289,7 @@
   </div>
   <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
   <script src="{{ url_for('static', filename='js/objrest.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
   <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
   <script src="{{ url_for('static', filename='js/conversion-rate.js') }}"></script>
 </body>

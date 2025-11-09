@@ -1226,3 +1226,102 @@ input[type="date"] {
         grid-template-columns: 1fr;
     }
 }
+
+.leaderboard-header .date-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.leaderboard-header .date-filter label {
+    font-size: 14px;
+    color: var(--dark);
+}
+
+#btnBuscar {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+
+.container-btn-file {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  background-color: #307750;
+  color: #fff;
+  border-style: none;
+  padding: 1em 2em;
+  border-radius: 0.5em;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 4px 8px 10px -3px rgba(0, 0, 0, 0.356);
+  transition: all 250ms;
+}
+.container-btn-file input[type="file"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.container-btn-file > svg {
+  margin-right: 1em;
+}
+.container-btn-file::before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 0;
+  border-radius: 0.5em;
+  background-color: #469b61;
+  z-index: -1;
+  transition: all 350ms;
+}
+.container-btn-file:hover::before {
+  width: 100%;
+}
+
+/* === Tarjeta Overview (Gráfico Pie) === */
+.reminders {
+    position: relative;
+    width: 100%;               
+    max-height: 600px;
+    background: var(--light);
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;     /* Header arriba, gráfico debajo */
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Encabezado del bloque Overview */
+.reminders .header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    grid-gap: 10px;
+    margin-bottom: 10px;        /* Separación controlada */
+}
+
+.reminders .header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+/* Canvas del gráfico */
+#salesOverviewChart {
+    width: 90%;                 /* Tamaño adaptable al ancho */
+    max-width: 400px;           /* Tamaño máximo del gráfico */
+    height: auto;
+    flex-grow: 1;               /* Ocupa el espacio restante del contenedor */
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px;           /* Espaciado leve debajo del título */
+}

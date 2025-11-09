@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">        
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">  
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/activity_table.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js"></script>      
     <title>HeromovilApp</title>
 </head>
 
@@ -23,6 +25,7 @@
             <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
             <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
             <li><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
+            <li><a href="{{ url_for('procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
             <!--<li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
             <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
             <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
@@ -111,63 +114,44 @@
         </ul>
         <!--Fin tarjetas -->
 
-            <!-- Tabla Ordenes Ventas
             <div class="bottom-data">
-                <div class="orders" id="top-empleados">
+                <!-- Recent Activity -->
+                <div class="orders">
                     <div class="header">
                         <i class='bx bx-receipt'></i>
-                        <h3>Top 10 Pav Ranking Ventas</h3>
-                        <!--<i class='bx bx-filter'></i>
-                        <i class='bx bx-search'></i>
+                        <h3>Actividad Reciente</h3>
                     </div>
-                    <table class="greyGridTable">
+                    <table class="activity-table">
                         <thead>
                             <tr>
-                                <th>Vendedor</th>
-                                <th>Total PAV</th>
-                                <th>Posición</th>
+                                <th>Nombre</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
                             </tr>
                         </thead>
-                        <tbody>                            
+                        <tbody>
+                            {% for activity in recent_activity %}
+                            <tr>
+                                <td>{{ activity[0][10:] }}</td>
+                                <td>{{ activity[1] }}</td>
+                                <td>{{ activity[2] }}</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
-                </div>            
-                <!-- End of Orders -->
+                </div>
+                <!-- End of Recent Activity -->
 
-                <!-- Reminders 
+                <!-- Overview -->
                 <div class="reminders">
                     <div class="header">
-                        <i class='bx bx-note'></i>
-                        <h3>Remiders</h3>
-                        <i class='bx bx-filter'></i>
-                        <i class='bx bx-plus'></i>
+                        <i class='bx bx-pie-chart-alt-2'></i>
+                        <h3>Overview</h3>
                     </div>
-                    <ul class="task-list">
-                        <li class="completed">
-                            <div class="task-title">
-                                <i class='bx bx-check-circle'></i>
-                                <p>Start Our Meeting</p>
-                            </div>
-                            <i class='bx bx-dots-vertical-rounded'></i>
-                        </li>
-                        <li class="completed">
-                            <div class="task-title">
-                                <i class='bx bx-check-circle'></i>
-                                <p>Analyse Our Site</p>
-                            </div>
-                            <i class='bx bx-dots-vertical-rounded'></i>
-                        </li>
-                        <li class="not-completed">
-                            <div class="task-title">
-                                <i class='bx bx-x-circle'></i>
-                                <p>Play Footbal</p>
-                            </div>
-                            <i class='bx bx-dots-vertical-rounded'></i>
-                        </li>
-                    </ul>
-                </div>-->
-                <!-- End of Reminders
-            </div>-->
+                    <canvas id="salesOverviewChart"></canvas>
+                </div>
+                <!-- End of Overview -->
+            </div>
 
             <!-- Tabla Ordenes Call Center-->
             <div class="bottom-data">
@@ -195,9 +179,7 @@
             </div>
         </main>
     </div>
-
-
-
+    
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
