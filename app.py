@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, g
 from chart_utils import get_chart_data, get_chart_data_logro
-from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, get_rank_pav_cc, guardar_filtrado_en_db, get_recent_activity, get_sales_overview
+from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, get_rank_pav_cc, get_recent_activity, get_sales_overview, insertar_pagos, generar_ventas, insertar_objetivos
 import gestiondata
 from datetime import datetime, timedelta, timezone
 import sqlite3
@@ -743,7 +743,7 @@ def upload_ventas():
 
     if file and file.filename.endswith('.xlsx'):
         try:
-            df = pd.read_excel(file)
+            df = pd.read_excel(file, header=9)          
             gestiondata.procesar_dataframe_ventas(df)
             return jsonify(success=True)
         except Exception as e:
@@ -751,5 +751,62 @@ def upload_ventas():
     else:
         return jsonify(success=False, error='Formato de archivo no válido. Use .xlsx')
 
+@app.route('/api/upload_pagos', methods=['POST'])
+def upload_pagos():
+    if 'pagos_excel' not in request.files:
+        return jsonify(success=False, error='No se encontró el archivo')
+
+    file = request.files['pagos_excel']
+
+    if file.filename == '':
+        return jsonify(success=False, error='No se seleccionó ningún archivo')
+
+    if file and file.filename.endswith('.xlsx'):
+        try:
+            df = pd.read_excel(file, header=9, usecols="B:Y")  # Leer desde la fila 10 (índice 9) 
+            # Convertir la columna 'dte' a datetime y establecer el formato de salida
+            df["dte"] = pd.to_datetime(
+                df["dte"], dayfirst=True, errors="coerce"
+            ).dt.strftime('%Y-%m-%d').fillna("")
+            df = df.where(pd.notnull(df), None)
+            # Normalizar columnas numéricas, truncando decimales para asegurar conversión a entero.
+            columnas_texto = ['tel_contacto', 'tel_contacto2', 'entity_name', 'plan_name', 'supervisor', 'tipo_pago']
+            for col in columnas_texto:
+                if col in df.columns:
+                    df[col] = gestiondata.limpiar_campo_texto(df[col])
+            # ---------------------------                        
+            insertar_pagos(df)
+            return jsonify(success=True)
+        except Exception as e:
+            return jsonify(success=False, error=str(e))
+    else:
+        return jsonify(success=False, error='Formato de archivo no válido. Use .xlsx')
+
+@app.route('/api/upload_objetivos', methods=['POST'])
+def upload_objetivos():
+    if 'objetivos_excel' not in request.files:
+        return jsonify(success=False, error='No se encontró el archivo')
+
+    file = request.files['objetivos_excel']
+
+    if file.filename == '':
+        return jsonify(success=False, error='No se seleccionó ningún archivo')
+
+    if file and file.filename.endswith('.xlsx'):
+        try:
+            # Pasamos el objeto de archivo directamente
+            insertar_objetivos(file)
+            return jsonify(success=True)
+        except Exception as e:
+            return jsonify(success=False, error=str(e))
+    else:
+        return jsonify(success=False, error='Formato de archivo no válido. Use .xlsx')
+    
+@app.route('/api/procesar')
+def procesar():
+    generar_ventas()    
+    return jsonify(success=True)
+
+    
 if __name__ == "__main__":
     app.run(debug=True)

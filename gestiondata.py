@@ -1,16 +1,14 @@
 #Libreria de gestion de datos
 import pandas as pd
 import cn as cn
+from flask import jsonify
+
 
 
 # Función para procesar los archivos.
-def procesar_dataframe_ventas(df):
+def procesar_dataframe_ventas(file):
     try:
-        # Almacenar los DataFrames de cada archivo XLSX
-        dfs = []  # correctas
-        dfsc = []  # canceladas
-        filtrado = pd.DataFrame()  # dataset nuevo, solo columnas especificas
-
+        df = pd.read_excel(file, header=9)
         # Diccionario para mapear condiciones y sus valores, para ajustar errores en grupos.        
         mapeo_condiciones_grupos = {
         "4G LTE OFICINA": "847 - GRUPO NET LTE 6",
@@ -340,27 +338,23 @@ def procesar_dataframe_ventas(df):
         }
 
         try:
-            # Convertir la columna 'fecha_digitacion_orden' a datetime y establecer la hora a las 00:00:00
-            df["fecha_digitacion_orden"] = pd.to_datetime(
-                df["fecha_digitacion_orden"], errors="coerce"
-            ).dt.normalize()
-
-            # Eliminar filas con fechas no válidas
-            df = df.dropna(subset=["fecha_digitacion_orden"])
-
             # Rellenar valores nulos
-            df = df.fillna("null")
+            #df = df.fillna("null")
 
             #Limpiar espacios en los nombres de las columnas de planes
             if 'nom_plan' in df.columns:
-                df['nom_plan'] = df['nom_plan'].str.strip()
+                 df['nom_plan'] = df['nom_plan'].str.strip() 
             if 'nom_plan_anterior' in df.columns:
-                df['nom_plan_anterior'] = df['nom_plan_anterior'].str.strip()
+                df['nom_plan_anterior'] = df['nom_plan_anterior'].str.strip() 
 
             # Normalizar columnas numéricas, truncando decimales para asegurar conversión a entero.
-            for col in ['telefono', 'imei', 'id_transaccion', 'sim','tel_contacto','tel_contacto2']:
+            text_cols = ['telefono', 'imei', 'id_transaccion', 'sim', 'tel_contacto', 'tel_contacto2']
+            for col in text_cols:
                 if col in df.columns:
-                    df[col] = df[col].astype(str).str.replace(r'\.0$', '', regex=True)
+                    # Convertir a string y quitar '.0'
+                    df[col] = df[col].astype(str).str.replace(r'\.0$', '', regex=True) 
+                    # Reemplazar "nan" o "None" (que se volvieron strings) por un nulo real de Pandas
+                    df[col] = df[col].replace(['nan', 'None', '<NA>', ''], pd.NA)
 
             # Función para modificar la columna según la condición, y aplicar el grupo correcto.
             def modificar_valor(row: pd.Series) -> str | None:
@@ -390,7 +384,7 @@ def procesar_dataframe_ventas(df):
             df["grupo_activacion_orden"] = df.apply(modificar_grupo, axis=1) # type: ignore
 
             # Lista de condiciones para eliminar filas y limpiar datos innecesarios.
-            condiciones_usuario = ["OS - SISTEMA ORDENES(AUTOMATICO)"]
+            condiciones_usuario = ["OS - SISTEMA ORDENES(AUTOMATICO)"] 
             condiciones_razon_servicio = [
                 "1159 - MISCELANEOS VIDEO ON DEMAND",
                 "1309 - ACTIVACIONES Y DESACTIVACIÓN SERVICIOS OPCIONALES",
@@ -412,36 +406,27 @@ def procesar_dataframe_ventas(df):
                 "349 - RETIRO QUITESE",
                 "5020 - TITULAR CON VALIDADOR DE IDENTIDAD",
                 "1323 - DISMINUCIÓN DE PLAN / PAQUETE",
-            ]
-
-            condiciones_canceladas = ["Cancelada"]
-
-            # Seleccionar filas canceladas
-            canceladas = df["estado_transaccion"].isin(condiciones_canceladas)
-            dfsc.append(df[canceladas])
+                "1319 - DISMINUCIÓN DE PRODUCTO POSTPAGO-POSTPAGO",
+                "1226 - CAMBIO DE PLAN MIGRACION DE ALTICE DOMINICANA",
+                "1328 - SUSPENSION TEMPORAL (30 DIAS)",
+                "1509 - ACTIV Y DESACTIV SERVICIO OPCIONAL VIRTUAL",
+                "29 - RECONEXION DEUDA SALDADA",
+                "350 - RETIRO QUITESE MOBCEL",
+                "43 - MISCELANEOS LOGICOS",
+                "484 - CORRECCIÓN CONTRATO",
+                "6513 - CAMBIO NUMERO PORTABILIDAD ALTICE - ALTICE",
+            ]            
 
             # Crear una condición compuesta para eliminar filas y datos innecesarios
             condicion = (
                 (df["usuario_creo_orden"].isin(condiciones_usuario))
-                | (df["razon_servicio"].isin(condiciones_razon_servicio))
-                | (df["estado_transaccion"].isin(condiciones_canceladas))
+                | (df["razon_servicio"].isin(condiciones_razon_servicio))                
             )
 
             # Eliminar las filas que cumplen la condición
             df.drop(df[condicion].index, inplace=True)
 
-            # Añadir el DataFrame resultante a la lista
-            dfs.append(df)
-
-        except Exception as e:
-            print(f"Error al procesar el dataframe: {e}")
-
-        # Unificar los DataFrames en uno solo
-        if dfs:
-            try:
-                data_set = pd.concat(dfs, ignore_index=True)
-                data_set_c = pd.concat(dfsc, ignore_index=True)
-
+            if not df.empty:
                 columnas_valida = [
                     "id_transaccion",
                     "fecha_digitacion_orden",
@@ -461,604 +446,66 @@ def procesar_dataframe_ventas(df):
                 ]
 
                 # Filtrar las columnas de interés
-                filtrado = data_set[columnas_valida].copy()
+                filtrado = df[columnas_valida].copy()
 
-                # Convertir columnas relevantes a numericas para evitar errores en comparaciones
-                columnas_a_convertir = ["id_transaccion", "telefono", "imei"]
-                for columna in columnas_a_convertir:
-                    if columna in filtrado.columns:
-                        filtrado.loc[:, columna] = pd.to_numeric(
-                            filtrado[columna], errors="coerce"
-                        )
-                    else:
-                        print(f"Advertencia: La columna '{columna}' no está en el DataFrame.")
-                       
+                # 1. Convertir Fechas (DATE)
+                # errors='coerce' convierte fechas inválidas en NaT (Not a Time), que se vuelve NULL
+                filtrado.loc[:, 'fecha_digitacion_orden'] = pd.to_datetime(filtrado['fecha_digitacion_orden'], errors='coerce')
+                filtrado.loc[:, 'fecha_termino_orden'] = pd.to_datetime(filtrado['fecha_termino_orden'], errors='coerce')
+                
+                # 2. Convertir Enteros (INTEGER)
+                # Usamos Int64 (con 'I' mayúscula) porque soporta nulos (pd.NA)
+                if 'subcanal' in filtrado.columns:
+                    filtrado.loc[:, 'subcanal'] = pd.to_numeric(filtrado['subcanal'], errors='coerce').astype('Int64')
 
+                #imei_nulo = filtrado['imei'].isnull()
+
+                # Para esas filas, reemplazar 'imei' con el valor de 'telefono'
+                #filtrado.loc[imei_nulo, 'imei'] = filtrado.loc[imei_nulo, 'telefono']
+                filtrado['imei'] = filtrado['imei'].fillna("111111111111111")
+                filtrado['telefono'] = filtrado['telefono'].fillna("8095999999")               
+                
                 # Eliminar duplicados
                 filtrado = filtrado.drop_duplicates(
-                    subset=["id_transaccion", "razon_servicio", "telefono", "imei"],
+                    subset=["fecha_digitacion_orden", "id_transaccion", "razon_servicio", "telefono"],
                     keep="last",
                 )                
                 
-
                 # Guardar en tabla transacciones
-                cn.guardar_filtrado_en_db(filtrado)   
-                generar_ventas();    
+                if not filtrado.empty:
+                    cn.guardar_filtrado_en_db(filtrado)
+                    # Mostrar mensaje de confirmación
+                    print("Procesamiento completado y datos guardados en la base de datos. 1")
+                    return jsonify({"status": "success", "message": "Datos procesados y guardados correctamente."})
+                else:
+                    print("No se encontraron datos válidos para procesar.")
+                    return jsonify({"status": "error", "message": "No se encontraron datos válidos para procesar."}), 400
 
-                # Mostrar mensaje de confirmación
-                print("Procesamiento completadoo y datos guardados en la base de datos.")                
+            else:
+                print("No se encontraron datos válidos para procesar después del filtrado.")
+                return jsonify({"status": "error", "message": "No se encontraron datos válidos para procesar después del filtrado."}), 400
 
-            except Exception as e:
-                print(f"Error al procesar los datos: {e}")
-                
-        else:
-            print("No se encontraron archivos válidos para procesar.")
+        except Exception as e:
+            print(f"Error al procesar el dataframe: {e}")
+            return jsonify({"status": "error", "message": f"Error al procesar el dataframe: {e}"}), 500
             
     except Exception as e:
-        print(f"Error al procesar los datos: {e}")        
+        print(f"Error al procesar los datos: {e}")
+        return jsonify({"status": "error", "message": f"Error al procesar los datos: {e}"}), 500
 
-def generar_ventas():
-    """
-    Genera un reporte de ventas basado en los datos almacenados en la base de datos.
-    Agrupa las ventas por diferentes categorías y guarda el resultado en la base de datos.
-    """
-    try:
-        conn = cn.conect()
-        query = """
-        SELECT *FROM transacciones
-        """
-        query2 = """
-        SELECT codigo, supervisor FROM usuarios
-        """
-        query3 = """
-        SELECT *FROM incentivosEmpleados
-        """
-        data = pd.read_sql(query, conn)
-        data_supers = pd.read_sql(query2, conn)
-        data_incentivos = pd.read_sql(query3, conn)        
-
-        # Convertir la columna 'fecha_digitacion_orden' a datetime y establecer la hora a las 00:00:00
-        data["fecha_digitacion_orden"] = pd.to_datetime(
-            data["fecha_digitacion_orden"], errors="coerce"
-        ).dt.normalize() 
-
-        # Convertir los datos en un DataFrame
-        df_group = data.copy()
-        df_group_Intermet = data.copy()
-        df_group_Card = data.copy()
-
-        # Definir los grupos de ventas y sus condiciones
-        grupos_ventas = {
-            "Flex/Max": (
-                df_group["razon_servicio"].isin(
-                    [
-                        "1425 - ACTIVACIONES DE LINEAS - SIN EQUIPOS (DEALERS)",
-                        "1409 - PORT SIN NUMERO TEMPORERO/SIN EQUIPO (CANAL PRESE)",
-                        "1126 - ACTIVACIONES DE LÍNEAS - CON EQUIPOS (EFECTIVO)",
-                        "1301 - ACTIVACIONES DE LINEAS - CON EQUIPOS",
-                        "1302 - PORT IN CON NUMERO TEMPORERO/CON EQUIPO",
-                        "1349 - PORT CON NUMERO TEMPORERO/SIN EQUIPO (CANAL PRESE)",
-                        "1402 - ACTIVACIONES LÍNEAS-SIN EQUIPOS (CANAL PRESENCIAL)",
-                    ]
-                )
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Migraciones": (
-                df_group["razon_servicio"].isin(
-                    [
-                        "1468 - AUMENTO DE PRODUCTO CON VENTA DE EQUIPO",                        
-                        "1316 - AUMENTO DE PRODUCTO PREPAGO-POSTPAGO",                        
-                    ]
-                )
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Fidepuntos Pospago": (
-                df_group["razon_servicio"].isin(
-                    ["1378 - USO DE FIDEPUNTOS (CAMBIA TU MOVIL)"]
-                )
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Fidepuntos Aumento": (
-                df_group["razon_servicio"].isin(
-                    [
-                     "5001 - AUMENTO DE PLAN CON VENTA EQUIPO POR FIDE",
-                     "5201 - AUMENTO DE PRODUCTO CON VENTA EQUIPO POR FIDE",
-                     ]
-                )
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Fidepuntos Disminucion": (
-                df_group["razon_servicio"].isin(
-                    ["5031 - DISMINUCIÓN DE PLAN CON VENTA EQUIPO POR FIDE"]
-                )
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Reemplazo Pospago": (
-                df_group["razon_servicio"].isin(["1324 - VENTA DE EQUIPOS/REEMPLAZO"])
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Reemplazo Aumento": (
-                df_group["razon_servicio"].isin(
-                    [
-                     "5000 - AUMENTO DE PLAN CON VENTA EQUIPO POR REEMPLAZO",
-                     "5200 - AUMENTO DE PRODUCTO CON VENTA EQUIPO POR REEMPLAZO",
-                     ]
-                )
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Reemplazo Disminucion": (
-                df_group["razon_servicio"].isin(
-                    ["5030 - DISMINUCIÓN DE PLAN CON VENTA EQUIPO POR REEMPLAZO"]
-                )
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Aumentos Pospago": (
-                df_group["razon_servicio"].isin(["1322 - AUMENTO DE PLAN / PAQUETE"])
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"883 - GRUPO 0|884 - GRUPO 1|885 - GRUPO 2|886 - GRUPO 3|887 - GRUPO 4|"
-                    r"888 - GRUPO 5|889 - GRUPO 6|890 - GRUPO 7|891 - GRUPO 8|893 - GRUPO 9|"
-                    r"894 - GRUPO 10|895 - GRUPO 11|912 - GRUPO 12",
-                    case=False,
-                    na=False,
-                )
-            ),
-        }
-
-        grupos_ventas_internet = {
-            "Internet": (
-                df_group_Intermet["razon_servicio"].isin(
-                    [
-                        "1301 - ACTIVACIONES DE LINEAS - CON EQUIPOS",
-                        "1402 - ACTIVACIONES LÍNEAS-SIN EQUIPOS (CANAL PRESENCIAL)",
-                    ]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"464 - GRUPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "InternetCard": (
-                df_group_Intermet["razon_servicio"].isin(
-                    [
-                        "1301 - ACTIVACIONES DE LINEAS - CON EQUIPOS",
-                        "1402 - ACTIVACIONES LÍNEAS-SIN EQUIPOS (CANAL PRESENCIAL)",
-                    ]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"482 - GRUPO NET 0 - 12 MESES",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Migracion Internet": (
-                df_group_Intermet["razon_servicio"].isin(
-                    [
-                        "1468 - AUMENTO DE PRODUCTO CON VENTA DE EQUIPO",
-                        "1316 - AUMENTO DE PRODUCTO PREPAGO-POSTPAGO",
-                    ]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"464 - GRUPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Reemplazo Internet": (
-                df_group_Intermet["razon_servicio"].isin(
-                    ["1324 - VENTA DE EQUIPOS/REEMPLAZO"]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"464 - GRUPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Reemplazo InternetAum": (
-                df_group_Intermet["razon_servicio"].isin(
-                    ["5000 - AUMENTO DE PLAN CON VENTA EQUIPO POR REEMPLAZO"]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"464 - GRUPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Reemplazo InternetDism": (
-                df_group_Intermet["razon_servicio"].isin(
-                    ["5030 - DISMINUCIÓN DE PLAN CON VENTA EQUIPO POR REEMPLAZO"]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"464 - GRUPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Fidepuntos Internet": (
-                df_group_Intermet["razon_servicio"].isin(
-                    ["1378 - USO DE FIDEPUNTOS (CAMBIA TU MOVIL)"]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"464 - GRUPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Fidepuntos InternetAum": (
-                df_group_Intermet["razon_servicio"].isin(
-                    ["5001 - AUMENTO DE PLAN CON VENTA EQUIPO POR FIDE"]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"464 - GR UPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Fidepuntos InternetDism": (
-                df_group_Intermet["razon_servicio"].isin(
-                    ["5031 - DISMINUCIÓN DE PLAN CON VENTA EQUIPO POR FIDE"]
-                )
-                & df_group_Intermet["grupo_activacion_orden"].str.contains(
-                    r"464 - GRUPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "Aumentos Internet": (
-                df_group_Intermet["razon_servicio"].isin(
-                    ["1322 - AUMENTO DE PLAN / PAQUETE"]
-                )
-                & df_group["grupo_activacion_orden"].str.contains(
-                    r"464 - GRUPO NET 1 - 18 MESES|465 - GRUPO NET 2 - 18 MESES|466 - GRUPO NET 3 - 18 MESES|"
-                    r"467 - GRUPO NET 4 - 18 MESES|471 - GRUPO NET 5 - 18 MESES|802 - GRUPO NET 6 - 18 MESES|"
-                    r"803 - GRUPO NET 7 - 18 MESES|",
-                    case=False,
-                    na=False,
-                )
-            ),
-        }
-
-        grupos_ventas_card = {
-            "Card": (
-                df_group_Card["razon_servicio"].isin(
-                    [
-                        "1425 - ACTIVACIONES DE LINEAS - SIN EQUIPOS (DEALERS)",
-                        "1409 - PORT SIN NUMERO TEMPORERO/SIN EQUIPO (CANAL PRESE)",                        
-                        "1349 - PORT CON NUMERO TEMPORERO/SIN EQUIPO (CANAL PRESE)",
-                        "1402 - ACTIVACIONES LÍNEAS-SIN EQUIPOS (CANAL PRESENCIAL)",
-                    ]
-                )
-                & df_group_Card["grupo_activacion_orden"].str.contains(
-                    r"322 - GRUPO CARD SIM ONLY|4 - CARD",
-                    case=False,
-                    na=False,
-                )
-            ),
-            "CardEquipo": (
-                df_group_Card["razon_servicio"].isin(
-                    [
-                        "1126 - ACTIVACIONES DE LÍNEAS - CON EQUIPOS (EFECTIVO)",
-                        "1301 - ACTIVACIONES DE LINEAS - CON EQUIPOS",
-                        "1302 - PORT IN CON NUMERO TEMPORERO/CON EQUIPO",                        
-                    ]
-                )
-                & df_group_Card["grupo_activacion_orden"].str.contains(
-                    r"322 - GRUPO CARD SIM ONLY|4 - CARD",
-                    case=False,
-                    na=False,
-                )
-            ),
-        }
-
-        # Agrupación card
-        df_group_Card["tipo_venta"] = None
-        for tipo, condicion in grupos_ventas_card.items():
-            df_group_Card.loc[condicion, "tipo_venta"] = tipo
-
-        # Extraer Grupo a partir de dos patrones
-        df_group_Card["Grupo1"] = df_group_Card["grupo_activacion_orden"].str.extract(
-            r"(\d+) - GRUPO CARD SIM ONLY", expand=False
-        )
-        df_group_Card["Grupo2"] = df_group_Card["grupo_activacion_orden"].str.extract(
-            r"(\d+) - CARD", expand=False
-        )
-
-        df_group_Card["Grupo"] = df_group_Card["Grupo1"].fillna(df_group_Card["Grupo2"])
-        df_group_Card.drop(["Grupo1", "Grupo2"], axis=1, inplace=True)
-        # fin card
-
-        # Agrupación Flex/Max
-        df_group["tipo_venta"] = None
-        for tipo, condicion in grupos_ventas.items():
-            df_group.loc[condicion, "tipo_venta"] = tipo
-
-        # Extraer el número del grupo para agruparlo
-        df_group["Grupo"] = (
-            df_group["grupo_activacion_orden"]
-            .str.extract(r"GRUPO (\d+)", expand=True)
-            .bfill(axis=1)[0]
-        )        
-
-        # Extraer el número del grupo anterior para agruparlo
-        df_group["Grupo_Anterior"] = (
-            df_group["grupo_activacion_anterior"]
-            .str.extract(r"GRUPO (\d+)", expand=True)
-            .bfill(axis=1)[0]
-        )
-        # fin flex/mas
-
-        # Agrupación Internet
-        df_group_Intermet["tipo_venta"] = None
-        for tipo, condicion in grupos_ventas_internet.items():
-            df_group_Intermet.loc[condicion, "tipo_venta"] = tipo
-
-        # Extraer el número del grupo para agruparlo
-        df_group_Intermet["Grupo"] = (
-            df_group_Intermet["grupo_activacion_orden"]
-            .str.extract(r"GRUPO NET (\d+)", expand=True)
-            .bfill(axis=1)[0]
-        )
-
-        # Extraer el número del grupo anterior para agruparlo
-        df_group_Intermet["Grupo_Anterior"] = (
-            df_group_Intermet["grupo_activacion_anterior"]
-            .str.extract(r"GRUPO NET (\d+)", expand=True)
-            .bfill(axis=1)[0]
-        )
-
-        df_group_Intermet["Grupo_Anterior"] = df_group_Intermet["Grupo_Anterior"].fillna(0)
-        # Fin Agrupacion Internet
-
-        # Rellenar NaN en "Grupo Anterior" con 0
-        df_group["Grupo_Anterior"] = df_group["Grupo_Anterior"].fillna(0)
-
-        # Generar conteo
-        ventas_validas = df_group.dropna(subset=["tipo_venta", "Grupo"], how="any")
-        conteo_ventas = (
-            ventas_validas.groupby(
-                [
-                    "entity_code",
-                    "subcanal",
-                    "fecha_digitacion_orden",                    
-                    "usuario_creo_orden",                    
-                    "tipo_venta",
-                    "Grupo",
-                    "Grupo_Anterior",
-                ]
-            )
-            .size()
-            .reset_index()
-        )
-
-        # Internet
-        ventas_validas_internet = df_group_Intermet.dropna(
-            subset=["tipo_venta", "Grupo"], how="any"
-        )
-        conteo_ventas_internet = (
-            ventas_validas_internet.groupby(
-                [
-                    "entity_code",
-                    "subcanal",
-                    "fecha_digitacion_orden",                                        
-                    "usuario_creo_orden",
-                    "tipo_venta",
-                    "Grupo",
-                    "Grupo_Anterior",
-                ]
-            )
-            .size()
-            .reset_index()
-        )
-
-        # card
-        ventas_validas_card = df_group_Card.dropna(subset=["tipo_venta"], how="any")
-        conteo_ventas_card = (
-            ventas_validas_card.groupby(
-                [
-                    "entity_code",
-                    "subcanal",
-                    "fecha_digitacion_orden",                                       
-                    "usuario_creo_orden",
-                    "tipo_venta",
-                    "Grupo",
-                ]
-            )
-            .size()
-            .reset_index()
-        )
-
-        # Renombrar la columna de conteo
-        conteo_ventas.rename(columns={0: "total_ventas"}, inplace=True)
-        conteo_ventas_internet.rename(columns={0: "total_ventas"}, inplace=True)
-        conteo_ventas_card.rename(columns={0: "total_ventas"}, inplace=True)
-
-        # Verificar si los DataFrames están vacíos
-        if conteo_ventas.empty:
-            raise ValueError("No se encontraron ventas válidas.")
-
-        if conteo_ventas_internet.empty:
-            raise ValueError("No se encontraron ventas válidas.")
-
-        if conteo_ventas_card.empty:
-            raise ValueError("No se encontraron ventas válidas.")
-
-        # Preparar los resultados individuales
-        resultado = conteo_ventas.reset_index()
-        resultado_card = conteo_ventas_card.reset_index()
-        resultado_internet = conteo_ventas_internet.reset_index()
-
-        # Concatenar todos los resultados
-        reultado_final = pd.concat(
-            [resultado, resultado_internet, resultado_card], ignore_index=True
-        )
-        reultado_final.rename(columns={"fecha_digitacion_orden": "fecha"}, inplace=True)
-
-        # Rellenar valores nulos en Grupo_Anterior
-        reultado_final["Grupo_Anterior"] = reultado_final["Grupo_Anterior"].fillna(0)        
-
-        # Extraer código de usuario para asignar supervisores
-        reultado_final["codigo"] = reultado_final["usuario_creo_orden"].str[:7]
-        data_supers["codigo"] = data_supers['codigo'].astype(str)        
-
-        # Unir con datos de supervisores
-        df_combinado = pd.merge(reultado_final, data_supers, on="codigo", how="left")
-        df_combinado = df_combinado.fillna(0)
-
-        # Convertir supervisor a entero sin decimales
-        df_combinado["supervisor"] = pd.to_numeric(df_combinado["supervisor"], errors='coerce')
-        df_combinado["supervisor"] = df_combinado["supervisor"].fillna(0).astype(int).astype(str)
-
-        # Lista de tipos de venta para los que Grupo_Anterior debe ser 0
-        tipos_venta_grupo_anterior_cero = [
-            "Reemplazo InternetAum",
-            "Fidepuntos InternetDism",
-            "Fidepuntos InternetAum",
-            "Reemplazo InternetDism",
-            "Reemplazo Disminucion",
-            "Reemplazo Aumento",
-            "Fidepuntos Disminucion",
-            "Fidepuntos Aumento",
-            "Migraciones",
-        ]
-
-        # Establecer Grupo_Anterior a 0 para los tipos de venta especificados
-        df_combinado.loc[df_combinado['tipo_venta'].isin(tipos_venta_grupo_anterior_cero), 'Grupo_Anterior'] = 0
-
-        # Reorganizar columnas
-        columnas = df_combinado.columns.tolist()
-        columnas.insert(
-            columnas.index("usuario_creo_orden"),
-            columnas.pop(columnas.index("supervisor")),
-        )
-        df_combinado = df_combinado[columnas]
-        df_combinado.drop("codigo", axis=1, inplace=True)
-
-        # Asegurar compatibilidad de tipos para el merge con incentivos
-        df_combinado["Grupo"] = df_combinado["Grupo"].astype(str)
-        df_combinado["Grupo_Anterior"] = df_combinado["Grupo_Anterior"].astype(str)
-        df_combinado["tipo_venta"] = df_combinado["tipo_venta"].astype(str)
-
-        data_incentivos["Grupo"] = data_incentivos["Grupo"].astype(str)
-        data_incentivos["Grupo_Anterior"] = data_incentivos["Grupo_Anterior"].astype(str)
-        data_incentivos["tipo_venta"] = data_incentivos["tipo_venta"].astype(str)
-
-        # depuración para verificar claves de unión
-        """
-        print("Valores únicos en df_combinado:")
-        print(f"tipo_venta: {df_combinado['tipo_venta'].unique()}")
-        print(f"Grupo: {df_combinado['Grupo'].unique()}")
-        print(f"Grupo_Anterior: {df_combinado['Grupo_Anterior'].unique()}")
-
-        print("\nValores únicos en data_incentivos:")
-        print(f"tipo_venta: {data_incentivos['tipo_venta'].unique()}")
-        print(f"Grupo: {data_incentivos['Grupo'].unique()}")
-        print(f"Grupo_Anterior: {data_incentivos['Grupo_Anterior'].unique()}")
-        """
-
-        # Realizar la unión con tabla de incentivos
-        df_combinado = pd.merge(
-            df_combinado,
-            data_incentivos,
-            on=["tipo_venta", "Grupo", "Grupo_Anterior"],
-            how="left"
-        )
-
-        # Verificar registros sin coincidencia
-        sin_coincidencia = df_combinado[df_combinado["Comision_100"].isna()]
-        if not sin_coincidencia.empty:
-            print(f"Hay {len(sin_coincidencia)} registros sin coincidencia en incentivos")
-            print(sin_coincidencia[["tipo_venta", "Grupo", "Grupo_Anterior"]].head())
-
-        # Convertir comisiones a numérico y rellenar valores nulos
-        df_combinado["Comision_100"] = pd.to_numeric(df_combinado["Comision_100"], errors='coerce').fillna(0)
-        df_combinado["Comision_75"] = pd.to_numeric(df_combinado["Comision_75"], errors='coerce').fillna(0)
-
-        # Asegurar que total_ventas es numérico
-        df_combinado["total_ventas"] = pd.to_numeric(df_combinado["total_ventas"], errors="coerce").fillna(0)
-
-        # Calcular comisiones
-        df_combinado["Comision_100"] = df_combinado["total_ventas"] * df_combinado["Comision_100"]
-        df_combinado["Comision_75"] = df_combinado["total_ventas"] * df_combinado["Comision_75"]
-
-        # Verificar cálculos
-        print("\nEjemplos de cálculos de comisión:")
-        muestra = df_combinado[df_combinado["Comision_100"] > 0].head(3)
-        for _, row in muestra.iterrows():
-            print(f"Venta: {row['total_ventas']}, Comisión 100%: {row['Comision_100']}")
-
-        # Guardar en base de datos
-        cn.guardar_ventas_detalle_en_db(df_combinado)
-        print("Ventas generadas y guardadas en la base de datos correctamente.")      
-        
-    except Exception as e:
-        print(f"Ocurrió un error: {e}")  
-        # Fin agugacion ventas
-
-
-
-
-
+# ------------------------------------------------------
+# Función auxiliar para normalizar valores tipo texto
+# ------------------------------------------------------
+def limpiar_campo_texto(serie):
+    """Convierte valores numéricos a texto, elimina '.0', espacios, y normaliza."""
+    # Convertir a string y limpiar
+    serie_str = (
+        serie.astype(str)
+        .str.replace(r"\.0$", "", regex=True)
+        .str.strip()
+        .str.replace(r"\s+", "", regex=True)
+        .str.upper()  # opcional: unifica mayúsculas/minúsculas
+    )
+    # Reemplazar los strings 'NAN', 'NONE', 'NULL' etc., por un nulo verdadero de Pandas (pd.NA)
+    serie_str = serie_str.replace(['NAN', 'NONE', '<NA>', 'NULL', ''], pd.NA)
+    return serie_str

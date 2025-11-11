@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         maintainAspectRatio: false,                        
                         plugins: {
                             legend: {
-                                position: 'bottom',
+                                position: 'top',
                             },
                             tooltip: {
                                 callbacks: {

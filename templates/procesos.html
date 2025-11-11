@@ -8,10 +8,14 @@
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/loader.css') }}">
   <title>Procesos</title>
 </head>
 
 <body>
+  <div class="loader-container" id="loader">
+    <div class="loader"></div>
+  </div>
   <!-- Sidebar -->
   <div class="sidebar close">
     <a href="#" class="logo">
@@ -73,9 +77,17 @@
         </div>
       </div>
 
-      <div class="bottom-data">
+          <div class="bottom-data">
         <div class="orders">
-          <button class="container-btn-file" id="btnSubirVentas">
+          <div class="header">
+            <h3>Cargar Archivos</h3>
+          </div>
+          <div class="upload-options">
+            <label><input type="checkbox" name="upload_type" value="ventas"> Ventas</label>
+            <label><input type="checkbox" name="upload_type" value="pagos"> Pagos</label>
+            <label><input type="checkbox" name="upload_type" value="objetivos"> Objetivos</label>
+          </div>
+          <button class="container-btn-file" id="btnSubirArchivo">
             <svg
               fill="#fff"
               xmlns="http://www.w3.org/2000/svg"
@@ -104,9 +116,12 @@
               20L44 20L44 22L36 22ZM36 27L44 27L44 29L36 29ZM36 35L44 35L44 37L36 37Z"
               ></path>
             </svg>
-            Cargar Ventas
+            Cargar Archivo
             <input class="file" name="text" type="file" accept=".xlsx"/>
-          </button>          
+          </button>
+          <button class="container-btn-file" id="btnProcesarVentas">
+            Procesar Ventas
+          </button>
         </div>
         </div>
       </div>
@@ -114,13 +129,12 @@
     <div class="bottom-data">
       <div class="orders">
      
-    </div>
+        </div>
       </div>
     </div>      
     </main>
 
-  </div>
-  <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+  </div>  
   <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
   <script src="{{ url_for('static', filename='js/procesos.js') }}"></script>
   
