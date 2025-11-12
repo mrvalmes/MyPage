@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 endpoint = '/api/upload_ventas';
                 formDataName = 'ventas_excel';
                 expectedHeaders = [
-                    'id_transaccion',
+                    'id_compania',
                 ];
                 headerRow = 10;
                 startColumn = 'B';

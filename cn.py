@@ -77,29 +77,75 @@ def pagos(empleado_id):
     else:
         return 0
 
-def get_ventas():
+def get_recargas(empleado_id):
     """
-    Retorna la cantidad (conteo) de registros de la tabla 'Venta_detalle'
+    Retorna la cantidad (conteo) de registros de la tabla 'pagos'
+    que tengan el campo 'userlogin' igual al valor proporcionado
+    y el campo 'concepto_pago' igual a 'RECARGA-TRIVISION'.
     """    
+    #print(f"Empleado ID recibido: {empleado_id}")  # Debugging line
+    conn = sqlite3.connect(conect())
+    cur = conn.cursor()
+
+    if empleado_id and empleado_id.lower() != "none":
+        query = """
+        SELECT SUM(monto) AS total_pago
+        FROM pagos
+        WHERE SUBSTR(userlogin, 1, 7) = ?
+        AND concepto_pago = '876-PAGO/VENTA RECARGA-TRIVISION MONTO VARIA'
+        AND strftime('%Y-%m', dte) = strftime('%Y-%m', 'now', 'localtime');        
+        """
+        cur.execute(query, (empleado_id,))
+    else:
+        query = """
+        SELECT SUM(monto) AS total_pago
+        FROM pagos
+        WHERE concepto_pago = '876-PAGO/VENTA RECARGA-TRIVISION MONTO VARIA'
+        AND strftime('%Y-%m', dte) = strftime('%Y-%m', 'now', 'localtime');
+        """
+        cur.execute(query)
+
+    resultado = cur.fetchone()
+    conn.close()
+    #Debugging lines
+    """ 
+    print(f"Consulta ejecutada recargas: {query}")  # Debugging line
+    print(f"Resultado de la consulta recargas: {resultado}")  # Debugging line
+    """
+
+    if resultado is not None:
+        return resultado[0]  # El primer (y único) valor es el conteo
+    else:
+        return 0
+    
+def get_ventas(empleado_id=None):
+    """
+    Retorna la suma de total_ventas de la tabla 'ventas_detalle'.
+    Puede ser filtrado por empleado_id.
+    """
     conn = sqlite3.connect(conect())
     cur = conn.cursor()
 
     query = """
     SELECT SUM(total_ventas) AS total_pav
-	FROM ventas_detalle
-	WHERE tipo_venta != 'Card'
-	AND entity_code != 'EX332'	
-	AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
-	AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
+    FROM ventas_detalle
+    WHERE tipo_venta != 'Card'
+    AND entity_code != 'EX332'
+    AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
     """
-    cur.execute(query)   
+    params = []
+
+    if empleado_id and empleado_id.lower() != 'none' and empleado_id.strip() != '':
+        query += " AND SUBSTR(usuario_creo_orden, 1, 7) = ?"
+        params.append(empleado_id)
+
+    cur.execute(query, params)
 
     resultado = cur.fetchone()
-
     conn.close()
 
-    if resultado is not None:
-        return resultado[0]  # El primer (y único) valor es el conteo
+    if resultado and resultado[0] is not None:
+        return resultado[0]
     else:
         return 0
 

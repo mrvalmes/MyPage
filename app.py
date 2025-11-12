@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, g
 from chart_utils import get_chart_data, get_chart_data_logro
-from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, get_rank_pav_cc, get_recent_activity, get_sales_overview, insertar_pagos, generar_ventas, insertar_objetivos
+from cn import conect, empleados, supervisor, pagos, get_ventas, get_rank_pav, get_rank_pav_cc, get_recent_activity, get_sales_overview, insertar_pagos, generar_ventas, insertar_objetivos, get_recargas
 import gestiondata
 from datetime import datetime, timedelta, timezone
 import sqlite3
@@ -281,6 +281,11 @@ def api_pagos():
 def api_pav():
     return jsonify({"pav": get_ventas()})
 
+@app.route("/api/recargas")
+def api_recargas():
+    empleado_id = request.args.get("empleado_id")
+    return jsonify({"recargas": get_recargas(empleado_id)})
+
 @app.route("/api/top_ventas")
 def api_topventas():
     start_date = request.args.get("start_date")
@@ -478,6 +483,7 @@ def incentivos():
             "incentivo": comisiones,
         }
 
+        """Debugging salidas        
         print("Objetivos:", objetivos)
         print("Resultados:", resultados)
         print("Logros calculados:", logro)
@@ -492,13 +498,13 @@ def incentivos():
             log = logro.get(cat, 0)
             inc = comisiones.get(cat, 0)
             print(f"{cat}: Objetivo={obj}, Resultado={res}, Logro={log}%, Incentivo=${inc}")
-
+        """
         return jsonify(data)
     except Exception as e:
         # Manejo de errores
-        print(f"ERROR en incentivos(): {str(e)}")
+        #print(f"ERROR en incentivos(): {str(e)}")
         import traceback
-        print(traceback.format_exc())
+        #print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/objetivos-y-resultados")
@@ -601,6 +607,8 @@ def resultados():
 
                     logro_porcentaje = round(logro_porcentaje, 2)
 
+                    """                    
+                    # Asignar la comisión según el porcentaje de logro  debugging prints                  
                     print("Logros porcentuales:")
                     for categoria, valor in comisiones.items():
                         print(f"{categoria}: {valor}%")
@@ -617,7 +625,7 @@ def resultados():
                     print(f"Suma Ventas: {suma_ventas}")
                     print(f"Objetivo Valor: {objetivo_valor}")
                     print(f"Logro Porcentaje: {logro_porcentaje}")  
-                    
+                    """
                 break
 
     logro = {}
@@ -743,7 +751,7 @@ def upload_ventas():
 
     if file and file.filename.endswith('.xlsx'):
         try:
-            df = pd.read_excel(file, header=9)          
+            df = pd.read_excel(file, header=9, usecols="B:BM")  # Leer desde la fila 10 (índice 9) 
             gestiondata.procesar_dataframe_ventas(df)
             return jsonify(success=True)
         except Exception as e:

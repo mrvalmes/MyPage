@@ -39,15 +39,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const pagosUrl = "/api/pagos?empleado_id=None";
   const pavUrl = "/api/pav";
+  const recargas = "/api/recargas";
+  
+
 
       // Cargar datos principales en paralelo: PAV , CLIENTES Y CR General.
     Promise.all([
         fetch(pagosUrl).then(r => r.json()),
-        fetch(pavUrl).then(r => r.json())
+        fetch(pavUrl).then(r => r.json()),
+        fetch(recargas).then(r => r.json())
     ])
-    .then(([dataPagos, dataPav]) => {
+    .then(([dataPagos, dataPav,dataRecargas]) => {
         const totalpagos = dataPagos.pagos || 0;
         const totalpav = dataPav.pav || 0;
+        const totalrecargas = dataRecargas.recargas || 0;
+
+        document.getElementById("recargas-value").textContent = "$"+totalrecargas.toLocaleString('en-US');
 
         document.getElementById("clientes-value").textContent = totalpagos.toLocaleString('en-US');
         document.getElementById("pav-value").textContent = totalpav.toLocaleString('en-US');
@@ -68,15 +75,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const pagosUrl = `/api/pagos?empleado_id=${empleadoId}`;
       const url = `/api/objetivos-y-resultados?empleado_id=${empleadoId}`;
+      const recargas = `/api/recargas?empleado_id=${empleadoId}`;
 
       // Ejecutar ambas peticiones y esperar las respuestas
       Promise.all([
         fetch(pagosUrl).then(r => r.json()),
-        fetch(url).then(r => r.json())
+        fetch(url).then(r => r.json()),
+        fetch(recargas).then(r => r.json())
       ])
-      .then(([pagosData, objetivosData]) => {
+      .then(([pagosData, objetivosData, recargasData]) => {
         const pagos = pagosData.pagos || 0;
+        const recargasTotal = recargasData.recargas || 0;
+        document.getElementById("recargas-value").textContent = "$"+recargasTotal.toLocaleString('en-US');
         document.getElementById("clientes-value").textContent = pagos.toLocaleString('en-US');
+
+
 
         const objetivos = objetivosData.objetivos || {};
         const resultados = objetivosData.resultados || {};

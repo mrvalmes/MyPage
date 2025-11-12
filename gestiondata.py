@@ -8,7 +8,11 @@ from flask import jsonify
 # Función para procesar los archivos.
 def procesar_dataframe_ventas(file):
     try:
-        df = pd.read_excel(file, header=9)
+        if isinstance(file, pd.DataFrame):
+            df = file
+        else:
+            df = pd.read_excel(file)  # Leer el archivo Excel
+        print(df.head())  # Muestra las primeras filas para verificar la carga correcta
         # Diccionario para mapear condiciones y sus valores, para ajustar errores en grupos.        
         mapeo_condiciones_grupos = {
         "4G LTE OFICINA": "847 - GRUPO NET LTE 6",
@@ -337,15 +341,12 @@ def procesar_dataframe_ventas(file):
             "5031 - DISMINUCIÓN DE PLAN CON VENTA EQUIPO POR FIDE":"0",
         }
 
-        try:
-            # Rellenar valores nulos
-            #df = df.fillna("null")
-
+        try:           
             #Limpiar espacios en los nombres de las columnas de planes
             if 'nom_plan' in df.columns:
-                 df['nom_plan'] = df['nom_plan'].str.strip() 
+                 df['nom_plan'] = df['nom_plan'].astype('string').str.strip() 
             if 'nom_plan_anterior' in df.columns:
-                df['nom_plan_anterior'] = df['nom_plan_anterior'].str.strip() 
+                df['nom_plan_anterior'] = df['nom_plan_anterior'].astype('string').str.strip() 
 
             # Normalizar columnas numéricas, truncando decimales para asegurar conversión a entero.
             text_cols = ['telefono', 'imei', 'id_transaccion', 'sim', 'tel_contacto', 'tel_contacto2']

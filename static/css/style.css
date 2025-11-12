@@ -1290,8 +1290,8 @@ input[type="date"] {
     width: 100%;               
     max-height: 600px;
     background: var(--light);
-    border-radius: 15px;
-    padding: 15px;
+    border-radius: 10px;
+    padding: 10px;
     display: flex;
     flex-direction: column;     /* Header arriba, gráfico debajo */
     justify-content: flex-start;
@@ -1317,8 +1317,8 @@ input[type="date"] {
 
 /* Canvas del gráfico */
 #salesOverviewChart {
-    width: 90%;                 /* Tamaño adaptable al ancho */
-    max-width: 400px;           /* Tamaño máximo del gráfico */
+    width: 100%;                 /* Tamaño adaptable al ancho */
+    max-width: 350px;           /* Tamaño máximo del gráfico */
     height: auto;
     flex-grow: 1;               /* Ocupa el espacio restante del contenedor */
     display: block;

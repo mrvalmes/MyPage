@@ -16,7 +16,7 @@ function renderTopVentas(tableSelector, data) {
     tbody.innerHTML = ''; // limpiar
 
     data.forEach((item, index) => {
-        const raw = item[0] || "";  // Ej: "1016312 - CARINA DE LA CRUZ"
+        const raw = item[0] || "";  
         const vendedor = raw.length > 10 ? raw.substring(10) : raw;
         const totalPav = item[1] ?? 0;
         const pos = index + 1;
@@ -37,18 +37,21 @@ function renderTopVentas(tableSelector, data) {
 document.addEventListener("DOMContentLoaded", function () {
     const pagosUrl = "/api/pagos?empleado_id=None";
     const pavUrl = "/api/pav";
-    //const topVentasUrl = "/api/top_ventas";
+    const recargas = "/api/recargas";    
     const topVentasCCUrl = "/api/top_ventas_cc";
 
     // Cargar datos principales en paralelo
     Promise.all([
         fetch(pagosUrl).then(r => r.json()),
-        fetch(pavUrl).then(r => r.json())
+        fetch(pavUrl).then(r => r.json()),
+        fetch(recargas).then(r => r.json())
     ])
-    .then(([dataPagos, dataPav]) => {
+    .then(([dataPagos, dataPav, dataRecargas]) => {
         const totalpagos = dataPagos.pagos || 0;
         const totalpav = dataPav.pav || 0;
+        const totalrecargas = dataRecargas.recargas || 0;
 
+        document.getElementById("recargas-value").textContent = '$' + totalrecargas.toLocaleString('en-US');
         document.getElementById("clientes-value").textContent = totalpagos.toLocaleString('en-US');
         document.getElementById("pav-value").textContent = totalpav.toLocaleString('en-US');
 
