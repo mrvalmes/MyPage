@@ -8,19 +8,18 @@ import bcrypt
 import json
 import pandas as pd
 
-# ======== NUEVO: JWT =========
+# ======== JWT =========
 from flask_jwt_extended import (
     JWTManager, create_access_token, get_jwt, get_jwt_identity,
     jwt_required
 )
 
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = "super-secret-key"   # cámbialo en producción
+app.config["JWT_SECRET_KEY"] = "super-secret-key"   # cámbiar en producción
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)  # token largo, inactividad controla expiración
 jwt = JWTManager(app)
 
-INACTIVITY_SECONDS = 5 * 60  # 5 minutos
-
+INACTIVITY_SECONDS = 3 * 60  # 3 minutos
 
 # ========= DB Helpers =========
 def get_db():
@@ -421,19 +420,21 @@ def incentivos():
         comisiones = {key: 0 for key in groups_map}
 
         for tv, suma_ventas, comision_75, comision_100 in rows_res_com:
-            print(f"Procesando {tv}: ventas={suma_ventas}, com75={comision_75}, com100={comision_100}")
+            #print(f"Procesando {tv}: ventas={suma_ventas}, com75={comision_75}, com100={comision_100}")
             for cat, lista_tv in groups_map.items():
                 if tv in lista_tv:
                     resultados[cat] += suma_ventas
                     # cat_obj_key = cat.lower().replace("/", "_").replace(" ", "_")
                     cat_obj_key = objetivos_map.get(cat)
 
+                    """
                     # Debug
                     print(f"Categoría: {cat}, clave objetivo: {cat_obj_key}")
                     if cat_obj_key in objetivos:
                         print(f"Objetivo para {cat}: {objetivos[cat_obj_key]}")
                     else:
                         print(f"No hay objetivo para {cat}")
+                    """
 
                     # Verificar si el objetivo existe y es mayor que 0
                     if cat_obj_key in objetivos and objetivos[cat_obj_key] > 0:
@@ -697,7 +698,7 @@ def api_conversion_rate():
     """
 
     # Parámetros seguros (todo en string o número, nada de funciones)
-    print("Parámetros recibidos:", empleado_id, dia)
+    #print("Parámetros recibidos:", empleado_id, dia)
     params = {
         'day': dia,
         'supervisor': empleado_id
