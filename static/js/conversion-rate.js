@@ -69,16 +69,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Llenar tabla
       if (tbody) tbody.innerHTML = '';
+      let totalVentas = 0;
+      let totalPagos = 0;
+
       data.forEach(row => {
+        const ventas = parseFloat(row.ventas_count) || 0;
+        const pagos = parseFloat(row.pagos_count) || 0;
+        
+        totalVentas += ventas;
+        totalPagos += pagos;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${escapeHtml(row.usuario_creo_orden.substring(10))}</td>
-          <td>${escapeHtml(row.ventas_count)}</td>
-          <td>${escapeHtml(row.pagos_count)}</td>
+          <td>${escapeHtml(ventas)}</td>
+          <td>${escapeHtml(pagos)}</td>
           <td>${escapeHtml(row.conversion_rate_pct)}%</td>
         `;
         tbody.appendChild(tr);
       });
+
+      // Calcular CR General
+      const crGeneral = totalPagos > 0 ? ((totalVentas / totalPagos) * 100).toFixed(2) : 0;
+
+      // Crear y agregar fila de totales
+      const totalRow = document.createElement('tr');
+      totalRow.style.fontWeight = 'bold';
+      totalRow.style.backgroundColor = 'var(--grey)';
+      totalRow.innerHTML = `
+        <td>Totales</td>
+        <td>${totalVentas}</td>
+        <td>${totalPagos}</td>
+        <td>${crGeneral}%</td>
+      `;
+      tbody.appendChild(totalRow);
 
     } catch (err) {
       console.error('Error al cargar Conversion Rate:', err);

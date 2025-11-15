@@ -746,13 +746,13 @@ margin-bottom: 0;
 
 #main-chart .filters .filter:hover,
 #main-chart .filters .filter.selected {
-    background-color: white;
+    background-color: var(--dark);
 }
 /*Texto filtro selectionar*/
 #main-chart .filters .filter:hover p,
 #main-chart .filters .filter.selected p {
     font-weight: bold 700;
-    color: #2601fa;
+    color: var(--primary);
 }
 
 #main-chart h2 {

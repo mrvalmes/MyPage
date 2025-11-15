@@ -512,58 +512,90 @@ def incentivos():
 def resultados():
     empleado_id = request.args.get("empleado_id")
 
-    if not empleado_id:
-        return jsonify({"error": "Falta empleado_id"}), 400
-
     conn = sqlite3.connect(conect())
     cur = conn.cursor()
 
-    # Consulta de OBJETIVOS
-    sql_objetivos = """
-    SELECT id_empleado, fecha,
-           sim_card_prepago, flex_max, internet_pospago,
-           migraciones_pospago_net, fidepuntos_pospago, fidepuntos_up,
-           reemplazo_pospago, reemplazo_up, fide_reemp_internet_up,
-           aumentos_plan_pos_net
-    FROM objetivos
-    WHERE id_empleado = ?
-      AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
-    ORDER BY fecha DESC
-    LIMIT 1
-    """
-    cur.execute(sql_objetivos, (empleado_id,))
-    row_obj = cur.fetchone()
-
     objetivos = {}
-    if row_obj:
-        objetivos = {
-            "id_empleado": row_obj[0],
-            "fecha": row_obj[1],
-            "sim_card_prepago": row_obj[2],
-            "flex_max": row_obj[3],
-            "internet_pospago": row_obj[4],
-            "migraciones_pospago_net": row_obj[5],
-            "fidepuntos_pospago": row_obj[6],
-            "fidepuntos_up": row_obj[7],
-            "reemplazo_pospago": row_obj[8],
-            "reemplazo_up": row_obj[9],
-            "fide_reemp_internet_up": row_obj[10],
-            "aumentos_plan_pos_net": row_obj[11],
-        }
+    rows_res_com = []
 
-    # Consulta de RESULTADOS y COMISIONES
-    like_pattern = empleado_id + " - %"
-    sql_resultados_comisiones = """
-    SELECT tipo_venta, SUM(total_ventas) AS suma_ventas,
-        COALESCE(SUM(Comision_75), 0) as comision_75_total,
-        COALESCE(SUM(Comision_100), 0) as comision_100_total
-    FROM ventas_detalle
-    WHERE strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
-    AND (usuario_creo_orden LIKE ? OR supervisor = ?)
-    GROUP BY tipo_venta;
-    """
-    cur.execute(sql_resultados_comisiones, (like_pattern, empleado_id))
-    rows_res_com = cur.fetchall()
+    if empleado_id:
+        # Lógica existente para un empleado específico
+        sql_objetivos = """
+        SELECT id_empleado, fecha,
+               sim_card_prepago, flex_max, internet_pospago,
+               migraciones_pospago_net, fidepuntos_pospago, fidepuntos_up,
+               reemplazo_pospago, reemplazo_up, fide_reemp_internet_up,
+               aumentos_plan_pos_net
+        FROM objetivos
+        WHERE id_empleado = ?
+          AND strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
+        ORDER BY fecha DESC
+        LIMIT 1
+        """
+        cur.execute(sql_objetivos, (empleado_id,))
+        row_obj = cur.fetchone()
+
+        if row_obj:
+            objetivos = {
+                "id_empleado": row_obj[0], "fecha": row_obj[1],
+                "sim_card_prepago": row_obj[2], "flex_max": row_obj[3],
+                "internet_pospago": row_obj[4], "migraciones_pospago_net": row_obj[5],
+                "fidepuntos_pospago": row_obj[6], "fidepuntos_up": row_obj[7],
+                "reemplazo_pospago": row_obj[8], "reemplazo_up": row_obj[9],
+                "fide_reemp_internet_up": row_obj[10], "aumentos_plan_pos_net": row_obj[11],
+            }
+
+        like_pattern = empleado_id + " - %"
+        sql_resultados = """
+        SELECT tipo_venta, SUM(total_ventas) AS suma_ventas
+        FROM ventas_detalle
+        WHERE strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
+        AND (usuario_creo_orden LIKE ? OR supervisor = ?)
+        GROUP BY tipo_venta;
+        """
+        cur.execute(sql_resultados, (like_pattern, empleado_id))
+        rows_res_com = cur.fetchall()
+
+    else:
+        # Nueva lógica para totales
+        sql_objetivos_total = """
+            SELECT
+                SUM(sim_card_prepago) AS total_sim_card_prepago,
+                SUM(flex_max) AS total_flex_max,
+                SUM(internet_pospago) AS total_internet_pospago,
+                SUM(migraciones_pospago_net) AS total_migraciones_pospago_net,
+                SUM(fidepuntos_pospago) AS total_fidepuntos_pospago,
+                SUM(fidepuntos_up) AS total_fidepuntos_up,
+                SUM(reemplazo_pospago) AS total_reemplazo_pospago,
+                SUM(reemplazo_up) AS total_reemplazo_up,
+                SUM(fide_reemp_internet_up) AS total_fide_reemp_internet_up,
+                SUM(aumentos_plan_pos_net) AS total_aumentos_plan_pos_net
+            FROM objetivos
+            WHERE strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
+            AND id_empleado NOT IN ('1025113', '1017255', '1016322');
+            """
+        cur.execute(sql_objetivos_total)
+        row_obj = cur.fetchone()
+
+        if row_obj:
+            objetivos = {
+                "sim_card_prepago": row_obj[0], "flex_max": row_obj[1],
+                "internet_pospago": row_obj[2], "migraciones_pospago_net": row_obj[3],
+                "fidepuntos_pospago": row_obj[4], "fidepuntos_up": row_obj[5],
+                "reemplazo_pospago": row_obj[6], "reemplazo_up": row_obj[7],
+                "fide_reemp_internet_up": row_obj[8], "aumentos_plan_pos_net": row_obj[9],
+            }
+
+        sql_resultados_total = """
+        SELECT tipo_venta, SUM(total_ventas) AS suma_ventas
+        FROM ventas_detalle
+        WHERE strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now', 'localtime')
+        AND ENTITY_CODE != 'EX332'
+        GROUP BY tipo_venta;
+        """
+        cur.execute(sql_resultados_total)
+        rows_res_com = cur.fetchall()
+
     conn.close()
 
     groups_map = {
@@ -576,66 +608,37 @@ def resultados():
         "Reemplazo Pos": ["Reemplazo Pospago", "Reemplazo Disminucion"],
         "Reemplazo Up": ["Reemplazo Aumento"],
         "Fide Reemp Internet Up": [
-            "Reemplazo Internet",
-            "Fidepuntos Internet",
-            "Fidepuntos InternetAum",
-            "Fidepuntos InternetDism",
-            "Reemplazo InternetAum",
-            "Reemplazo InternetDism",
+            "Reemplazo Internet", "Fidepuntos Internet",
+            "Fidepuntos InternetAum", "Fidepuntos InternetDism",
+            "Reemplazo InternetAum", "Reemplazo InternetDism",
         ],
         "Aumentos": ["Aumentos Pospago", "Aumentos Internet"],
     }
 
     resultados = {key: 0 for key in groups_map}
-    comisiones = {key: 0 for key in groups_map}
 
-    for tv, suma_ventas, comision_75, comision_100 in rows_res_com:
+    for tv, suma_ventas in rows_res_com:
         for cat, lista_tv in groups_map.items():
             if tv in lista_tv:
                 resultados[cat] += suma_ventas
-                cat_obj_key = cat.lower().replace("/", "_").replace(" ", "_")
-
-                # Verificar si el objetivo existe y es mayor que 0
-                if cat_obj_key in objetivos and objetivos[cat_obj_key] > 0:
-                    objetivo_valor = objetivos[cat_obj_key]
-
-                    # Calcular el logro porcentual
-                    logro_porcentaje = (
-                        (suma_ventas / objetivo_valor) * 100
-                        if objetivo_valor > 0
-                        else 0
-                    )
-
-                    logro_porcentaje = round(logro_porcentaje, 2)
-
-                    """                    
-                    # Asignar la comisión según el porcentaje de logro  debugging prints                  
-                    print("Logros porcentuales:")
-                    for categoria, valor in comisiones.items():
-                        print(f"{categoria}: {valor}%")
-
-                    print(f"Tipo de Venta (tv): {tv}")
-                    print(f"Lista de Tipos de Venta (lista_tv): {lista_tv}")
-
-                    print(
-                        f"Logro {cat}: {logro_porcentaje}, Com75: {comision_75}, Com100: {comision_100}"
-                    )
-
-                    # Imprimir valores para depuración
-                    print(f"Categoría: {cat}")
-                    print(f"Suma Ventas: {suma_ventas}")
-                    print(f"Objetivo Valor: {objetivo_valor}")
-                    print(f"Logro Porcentaje: {logro_porcentaje}")  
-                    """
                 break
 
     logro = {}
-    for cat in resultados:
-        cat_obj_key = cat.lower().replace("/", "_").replace(" ", "_")
-        if cat_obj_key in objetivos and objetivos[cat_obj_key] > 0:
-            logro[cat] = round((resultados[cat] / objetivos[cat_obj_key]) * 100, 2)
+    objetivos_map = {
+        "Card": "sim_card_prepago", "Flex/Max": "flex_max", "Internet": "internet_pospago",
+        "Migraciones": "migraciones_pospago_net", "Fidepuntos Pos": "fidepuntos_pospago",
+        "Fidepuntos Up": "fidepuntos_up", "Reemplazo Pos": "reemplazo_pospago",
+        "Reemplazo Up": "reemplazo_up", "Fide Reemp Internet Up": "fide_reemp_internet_up",
+        "Aumentos": "aumentos_plan_pos_net"
+    }
+
+    for cat, res_valor in resultados.items():
+        obj_key = objetivos_map.get(cat)
+        if obj_key and obj_key in objetivos and objetivos[obj_key] and objetivos[obj_key] > 0:
+            logro[cat] = round((res_valor / objetivos[obj_key]) * 100, 2)
         else:
             logro[cat] = 0.0
+            
     data = {
         "objetivos": objetivos,
         "resultados": resultados,
