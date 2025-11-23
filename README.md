@@ -11,7 +11,7 @@ Esta es una aplicación web desarrollada en Flask que sirve como un dashboard pa
 - **API REST:** Endpoints para consultar datos de empleados, supervisores, ventas, y más.
 - **Visualización de Rankings:** Muestra los empleados con mejores rendimientos en ventas.
 
-## Estructura del Proyecto
+## Estructura del Proyecto. Nota: esta estructura es obsoleta el programa se mejoro para ser mas seguro, separando la logica de negocio de la presentacion. 
 
 - `app.py`: Archivo principal de la aplicación Flask. Contiene las rutas, la lógica de negocio y la configuración.
 - `cn.py`: Módulo para la conexión a la base de datos SQLite y funciones para la consulta de datos.

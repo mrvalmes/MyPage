@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
         switch (uploadType) {
             case 'ventas':
                 endpoint = '/api/upload_ventas';
-                formDataName = 'ventas_excel';
+                formDataName = 'file';
                 expectedHeaders = [
                     'id_compania',
                 ];
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
             case 'pagos':
                 endpoint = '/api/upload_pagos';
-                formDataName = 'pagos_excel';
+                formDataName = 'file';
                 expectedHeaders = [
                     'id_tipo_compania',
                 ];
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
             case 'objetivos':
                 endpoint = '/api/upload_objetivos';
-                formDataName = 'objetivos_excel';
+                formDataName = 'file';
                 expectedHeaders = [
                     'id_empleado', 
                 ];
@@ -116,16 +116,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => response.json())
                 .then(data => {
                     hideLoader();
-                    if (data.success) {
-                        alert(`Archivo de ${uploadType} cargado y procesado correctamente.`);
-                    } else {
+                    if (data.message) {
+                        alert(data.message);
+                    } else if (data.error) {
                         alert(`Error al cargar el archivo: ${data.error}`);
+                    } else {
+                        alert('Respuesta inesperada del servidor.');
                     }
+                    inputArchivo.value = ''; // Limpiar el input después de procesar
                 })
                 .catch(error => {
                     hideLoader();
                     console.error('Error:', error);
                     alert('Ocurrió un error al procesar la solicitud.');
+                    inputArchivo.value = ''; // Limpiar el input en caso de error
                 });
             } catch (error) {
                 console.error("Error al leer el archivo Excel:", error);
@@ -139,14 +143,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnProcesarVentas = document.getElementById('btnProcesarVentas');
     btnProcesarVentas.addEventListener('click', function () {
         showLoader();
-        fetch('/api/procesar')
+        fetch('/api/generar_ventas', {
+            method: 'POST'
+        })
             .then(response => response.json())
             .then(data => {
                 hideLoader();
-                if (data.success) {
-                    alert('Ventas procesadas correctamente.');
+                if (data.status === 'success' || data.status === 'warning') {
+                    alert(data.message);
                 } else {
-                    alert('Error al procesar las ventas: ' + data.error);
+                    alert('Error al procesar las ventas: ' + (data.message || data.error));
                 }
             })
             .catch(error => {

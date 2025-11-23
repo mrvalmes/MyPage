@@ -19,15 +19,15 @@
             <div class="logo-name"><span>Hero</span>Movil</div>
         </a>
         <ul class="side-menu">
-            <li><a href="{{ url_for('home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>
-            <li><a href="{{ url_for('dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
-            <li><a href="{{ url_for('Comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
-            <li class="active"><a href="{{ url_for('posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
-            <li><a href="{{ url_for('procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
+            <li><a href="{{ url_for('main.home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>
+            <li><a href="{{ url_for('main.dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
+            <li><a href="{{ url_for('main.comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
+            <li class="active"><a href="{{ url_for('main.posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
+            <li><a href="{{ url_for('main.procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
         </ul>
         <ul class="side-menu">
             <li>
-                <a href="{{ url_for('index') }}" class="logout">
+                <a href="{{ url_for('main.index') }}" class="logout">
                     <i class='bx bx-log-out-circle'></i>
                     Logout
                 </a>

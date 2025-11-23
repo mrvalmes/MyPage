@@ -3,3 +3,6 @@ flask-jwt-extended
 pandas
 openpyxl
 bcrypt
+psycopg2-binary
+Flask-SQLAlchemy
+Flask-Bcrypt
