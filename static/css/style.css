@@ -814,7 +814,7 @@ select {
 
 /* The switch - the box around the slider */
 .switch {
-    font-size: 17px;
+    font-size: 13px;
     position: relative;
     display: inline-block;
     width: 3.5em;
@@ -1141,7 +1141,7 @@ input[type="date"] {
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 15px;
-    border: 3px solid #444; /* Borde gris por defecto */
+    border: 3px solid var(--dark); /* Borde gris por defecto */
 }
 
 /* Bordes de colores para el Top 3 (como en la imagen) */

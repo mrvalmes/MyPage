@@ -15,13 +15,23 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
         if (response.ok) {
             localStorage.setItem('token', data.access_token);
-            window.location.href = '/home';
+            
+            // Redirigir según el rol del usuario
+            const nivel = data.nivel;
+            
+            if (nivel === 'ventas') {
+                // Usuario VENTAS va a dashboard (no tiene acceso a home)
+                window.location.href = '/dashboard';
+            } else {
+                // ADMIN y SUPERVISOR van a home
+                window.location.href = '/home';
+            }
         } else {
-            alert(data.msg);
+            alert(data.msg || 'Error al iniciar sesión');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error en el servidor');
+        alert('Error al conectar con el servidor');
     }
 });
 
@@ -37,16 +47,5 @@ function logout() {
     });
 }
 
-// Auto logout tras 5 minutos de inactividad
-let inactivityTimer;
-function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-        logout();
-        alert("Sesión expirada por inactividad");
-    }, 5 * 60 * 1000);
-}
-
-document.addEventListener("mousemove", resetInactivityTimer);
-document.addEventListener("keydown", resetInactivityTimer);
-resetInactivityTimer();
+// El timer de inactividad se maneja en el backend (10 minutos)
+// session_manager.js detecta cuando el backend expira la sesión (código HTTP 440)

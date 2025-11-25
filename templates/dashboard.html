@@ -26,10 +26,6 @@
       <li><a href="{{ url_for('main.comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
       <li><a href="{{ url_for('main.posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
       <li><a href="{{ url_for('main.procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
-      <!--<li><a href="#"><i class='bx bx-store-alt'></i>Comisiones</a></li>
-            <li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
-            <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
-            <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>-->
     </ul>
     <ul class="side-menu">
       <li>
@@ -80,10 +76,6 @@
             <li><a href="#" class="active">Ventas</a></li>
           </ul>
         </div>
-        <!--<a href="#" class="report">
-                    <i class='bx bx-cloud-download'></i>
-                    <span>Download CSV</span>
-                </a>-->
       </div>
       <!-- End of info -->
 
@@ -320,6 +312,8 @@
     </main>
 
   </div>
+  <!-- Antes del cierre </body>, agregar: -->
+<script src="{{ url_for('static', filename='js/role_ui_manager.js') }}"></script>
   <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
   <script src="{{ url_for('static', filename='js/objrest.js') }}"></script>
   <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>

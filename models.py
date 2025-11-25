@@ -2,6 +2,17 @@
 from extensions import db
 from datetime import datetime, timezone
 from sqlalchemy import UniqueConstraint
+import enum
+
+# Enum para roles de usuario
+class RolUsuario(enum.Enum):
+    ADMIN = "admin"
+    SUPERVISOR = "supervisor"
+    VENTAS = "ventas"
+    
+    @classmethod
+    def values(cls):
+        return [rol.value for rol in cls]
 
 class UsuariosLogin(db.Model):
     """ Modelo para la tabla usuariosligin, para autenticación """
@@ -9,13 +20,31 @@ class UsuariosLogin(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     usuario = db.Column(db.String, unique=True, nullable=False)
     clave_hash = db.Column(db.String, nullable=False)
-    nivel_acceso = db.Column(db.String, nullable=False, default='viewer')
+    
+    # FK a usuarios (empleado asociado)
+    codigo_usuario = db.Column(db.String, db.ForeignKey('usuarios.codigo'), nullable=True)
+    
+    # Usar Enum para roles
+    nivel_acceso = db.Column(db.Enum(RolUsuario), nullable=False, default=RolUsuario.VENTAS)
+    
     fecha_creacion = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     ultimo_login = db.Column(db.DateTime, nullable=True)
     activo = db.Column(db.Integer, default=1)
+    
+    # Relación con Usuarios
+    empleado = db.relationship('Usuarios', backref=db.backref('usuario_login', uselist=False))
 
     def __repr__(self):
         return f'<UsuarioLogin {self.usuario}>'
+    
+    def tiene_permiso(self, ruta: str) -> bool:
+        """Verifica si el usuario tiene permiso para acceder a una ruta"""
+        permisos = {
+            RolUsuario.ADMIN: ['home', 'dashboard', 'posiciones', 'comisiones', 'procesos', 'mantenimientos'],
+            RolUsuario.SUPERVISOR: ['home', 'dashboard', 'posiciones', 'comisiones'],
+            RolUsuario.VENTAS: ['dashboard', 'comisiones', 'posiciones']
+        }
+        return ruta in permisos.get(self.nivel_acceso, [])
 
 class Usuarios(db.Model):
     """ Modelo para la tabla 'usuarios' con información general de empleados/supervisores """

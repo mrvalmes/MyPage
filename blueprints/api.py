@@ -17,9 +17,20 @@ from datetime import datetime
 api_bp = Blueprint('api', __name__)
 
 @api_bp.route("/api/empleados")
+def api_empleados():
+    """Endpoint público para obtener lista de empleados (usado en registro)"""
+    empleados_list = Usuarios.query.filter_by(status=1).all()
+    return jsonify([{
+        "id": e.codigo,
+        "nombre": e.nombre,
+        "puesto": e.puesto or "N/A"
+    } for e in empleados_list])
+
+@api_bp.route("/api/empleados-full")
 @jwt_required()
 @require_active_single_session
-def api_empleados():
+def api_empleados_full():
+    """Endpoint protegido para obtener lista completa de empleados"""
     empleados_list = Usuarios.query.all()
     return jsonify([{"id": e.codigo, "nombre": e.nombre} for e in empleados_list])
 
@@ -57,9 +68,16 @@ def chart_data():
 @jwt_required()
 @require_active_single_session
 def api_pagos():
-    empleado_id = request.args.get("empleado_id")
+    from utils.permissions import get_current_user
+    from models import RolUsuario
     
-    # Return total count of pagos for the employee or all if no employee specified
+    empleado_id = request.args.get("empleado_id")
+    user = get_current_user()
+    
+    # Si es VENTAS, forzar su código
+    if user and user.nivel_acceso == RolUsuario.VENTAS:
+        empleado_id = user.codigo_usuario
+    
     total_pagos = get_total_pagos(empleado_id)
     return jsonify({"pagos": total_pagos})
 
@@ -67,7 +85,16 @@ def api_pagos():
 @jwt_required()
 @require_active_single_session
 def api_pav():
+    from utils.permissions import get_current_user
+    from models import RolUsuario
+    
     empleado_id = request.args.get("empleado_id")
+    user = get_current_user()
+    
+    # Si es VENTAS, forzar su código
+    if user and user.nivel_acceso == RolUsuario.VENTAS:
+        empleado_id = user.codigo_usuario
+    
     total_pav = get_total_pav(empleado_id)
     return jsonify({"pav": total_pav})
 
@@ -75,9 +102,16 @@ def api_pav():
 @jwt_required()
 @require_active_single_session
 def api_recargas():
-    empleado_id = request.args.get("empleado_id")
+    from utils.permissions import get_current_user
+    from models import RolUsuario
     
-    # Always return the total sum of recharges, filtering by employee if provided
+    empleado_id = request.args.get("empleado_id")
+    user = get_current_user()
+    
+    # Si es VENTAS, forzar su código
+    if user and user.nivel_acceso == RolUsuario.VENTAS:
+        empleado_id = user.codigo_usuario
+    
     total_recargas = get_total_recargas(empleado_id)
     return jsonify({"recargas": total_recargas})
 
@@ -146,28 +180,22 @@ def update_positions():
 @jwt_required()
 @require_active_single_session
 def incentivos():
-    # Moved logic to report_service if complex, but for now keeping it here or moving?
-    # The implementation plan said "Move complex queries... here".
-    # But I didn't put `incentivos` logic in `report_service.py` in the previous step!
-    # I missed copying `incentivos` and `resultados` (objetivos-y-resultados) logic to `report_service.py`.
-    # I only copied `get_chart_data` etc.
-    # I should have checked `report_service.py` content more carefully.
-    # I will leave them here for now to avoid breaking, or I can add them to `report_service.py` in a fix step.
-    # Given the complexity, I'll keep them here for this iteration or try to move them if I can edit `report_service.py`.
-    # I'll keep them here to ensure I don't lose logic, as I can't easily append to `report_service.py` without rewriting it.
-    # Actually, I should probably rewrite `report_service.py` to include them if I want to follow the plan strictly.
-    # But for now, to get the app running, I will keep the logic in `api.py` but imported or just inline.
-    # Since I didn't define them in `report_service.py`, I MUST define them here or add them.
-    # I'll define them here inline for now.
-    
-    # ... (Logic for incentivos - simplified or copied?)
-    # I'll copy the logic from the original app.py view.
+    from utils.permissions import get_current_user, puede_ver_empleado
+    from models import RolUsuario
     
     try:
         empleado_id = request.args.get("empleado_id")
         selected_month = request.args.get("month")
         current_year = datetime.now().year
         selected_year = request.args.get("year", default=str(current_year))
+        
+        user = get_current_user()
+        
+        # Si es VENTAS, forzar su código
+        if user and user.nivel_acceso == RolUsuario.VENTAS:
+            empleado_id = user.codigo_usuario
+        elif empleado_id and not puede_ver_empleado(empleado_id):
+            return jsonify({"error": "No tiene permisos para ver estos datos"}), 403
 
         if not empleado_id:
             return jsonify({"error": "Falta empleado_id"}), 400
@@ -290,10 +318,21 @@ def incentivos():
 @jwt_required()
 @require_active_single_session
 def resultados():
+    from utils.permissions import get_current_user, puede_ver_empleado
+    from models import RolUsuario
+    
     # Similar logic to incentivos but slightly different.
     # I'll implement it inline as well for now.
     empleado_id = request.args.get("empleado_id")
     current_month_year = datetime.now().strftime('%Y-%m')
+    
+    user = get_current_user()
+    
+    # Si es VENTAS, forzar su código
+    if user and user.nivel_acceso == RolUsuario.VENTAS:
+        empleado_id = user.codigo_usuario
+    elif empleado_id and not puede_ver_empleado(empleado_id):
+        return jsonify({"error": "No tiene permisos para ver estos datos"}), 403
 
     objetivos = {}
     rows_res_com = []

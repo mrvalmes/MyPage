@@ -3,10 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>HeromovilApp</title>
-
-    <!-- Logo (opcional ponerlo en <body> o <head>) 
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">-->
+    <title>Registro - HeromovilApp</title>
 
     <!-- CSS de login -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
@@ -19,26 +16,57 @@
 <body>
     <section>
         <form id="registerForm">
-            <h1>Inicio</h1>
+            <h1>Registro de Usuario</h1>
+            
+            <!-- Email -->
             <div class="inputbox">
                 <ion-icon name="mail-outline"></ion-icon>
                 <input type="email" id="email" required>
-                <label>Usuario</label>
+                <label>Email / Usuario</label>
             </div>
+            
+            <!-- Contraseña -->
             <div class="inputbox">
                 <ion-icon name="lock-closed-outline"></ion-icon>
                 <input type="password" id="password" required>
                 <label>Contraseña</label>
             </div>
+            
+            <!-- Confirmar Contraseña -->
             <div class="inputbox">
                 <ion-icon name="lock-closed-outline"></ion-icon>
                 <input type="password" id="confirmPassword" required>
                 <label>Confirmar Contraseña</label>
             </div>
+            
+            <!-- Seleccionar Empleado -->
             <div class="inputbox">
-                <ion-icon name="key-sharp"></ion-icon> 
-                <select name="nivel" id="nivel" required>
-                    <option value="ventas" selected>ventas</option>
+                <ion-icon name="person-outline"></ion-icon>
+                <select id="codigo_usuario" required>
+                    <option value="">Seleccione un empleado...</option>
+                </select>
+                <label style="top: -10px; font-size: 12px;">Empleado Asociado</label>
+            </div>
+            
+            <!-- Rol -->
+            <div class="inputbox">
+                <ion-icon name="key-sharp"></ion-icon>
+                <select id="nivel" required>
+                    <option value="">Seleccione un rol...</option>
+                    <option value="admin">Administrador (Acceso Total)</option>
+                    <option value="supervisor">Supervisor (Home, Dashboard, Posiciones, Comisiones)</option>
+                    <option value="ventas">Ventas (Dashboard, Comisiones, Posiciones - Solo sus datos)</option>
+                </select>
+                <label style="top: -10px; font-size: 12px;">Rol</label>
+            </div>
+            
+            <button type="submit">Registrar</button>
+            <div class="register">
+                <p>¿Ya tienes cuenta? <a href="{{ url_for('main.index') }}">Iniciar Sesión</a></p>
+            </div>
+        </form>
+    </section>
+    
     <script src="{{ url_for('static', filename='js/registro.js') }}"></script>
 </body>
 </html>

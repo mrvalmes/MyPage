@@ -52,7 +52,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(salesOverviewData => {
-                const ctx = document.getElementById('salesOverviewChart').getContext('2d');
+                const chartElement = document.getElementById('salesOverviewChart');
+                if (!chartElement) {
+                    console.log('salesOverviewChart no encontrado en esta página');
+                    return;
+                }
+                
+                const ctx = chartElement.getContext('2d');
 
                 if (salesChart) {
                     salesChart.destroy();
