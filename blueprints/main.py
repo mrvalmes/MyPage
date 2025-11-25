@@ -19,10 +19,7 @@ def home():
     sales_overview = get_sales_overview()
     return render_template("Home.html", recent_activity=recent_activity, sales_overview=sales_overview)
 
-@main_bp.route("/Registro")
-def registro():
-    # Registro es público (no requiere autenticación)
-    return render_template("registro.html")
+
 
 @main_bp.route("/dashboard")
 @jwt_required()

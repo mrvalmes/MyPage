@@ -161,6 +161,52 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Ocurrió un error al procesar la solicitud.');
             });
     });
+
+    // Crear Usuario Admin
+    const createUserForm = document.getElementById('createUserForm');
+    if (createUserForm) {
+        createUserForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const usuario = document.getElementById('new_usuario').value;
+            const codigo_usuario = document.getElementById('new_codigo_usuario').value;
+            const nivel = document.getElementById('new_nivel').value;
+            const temp_password = document.getElementById('temp_password').value;
+
+            showLoader();
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/create-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        usuario,
+                        codigo_usuario,
+                        nivel,
+                        temp_password
+                    })
+                });
+
+                const data = await response.json();
+                hideLoader();
+
+                if (response.ok) {
+                    alert(data.msg);
+                    createUserForm.reset();
+                } else {
+                    alert(data.msg || "Error al crear usuario");
+                }
+            } catch (error) {
+                hideLoader();
+                console.error("Error:", error);
+                alert("Error de conexión");
+            }
+        });
+    }
 });
 // Se necesita la librería xlsx.js para la validación de cabeceras
 const script = document.createElement('script');

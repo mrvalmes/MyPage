@@ -30,6 +30,7 @@ class UsuariosLogin(db.Model):
     fecha_creacion = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     ultimo_login = db.Column(db.DateTime, nullable=True)
     activo = db.Column(db.Integer, default=1)
+    force_password_change = db.Column(db.Boolean, default=False, nullable=False)
     
     # Relación con Usuarios
     empleado = db.relationship('Usuarios', backref=db.backref('usuario_login', uselist=False))

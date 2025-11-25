@@ -128,9 +128,35 @@
 
     <div class="bottom-data">
       <div class="orders">
-     
+        <div class="header">
+          <h3>Gestión de Usuarios</h3>
         </div>
+        <form id="createUserForm" style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="form-group">
+                <label for="new_usuario">Usuario (Email)</label>
+                <input type="email" id="new_usuario" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <div class="form-group">
+                <label for="new_codigo_usuario">Código Empleado (Opcional)</label>
+                <input type="text" id="new_codigo_usuario" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <div class="form-group">
+                <label for="new_nivel">Rol</label>
+                <select id="new_nivel" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    <option value="" disabled selected>Seleccione un rol...</option>
+                    <option value="admin">Administrador</option>
+                    <option value="supervisor">Supervisor</option>
+                    <option value="ventas">Ventas</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="temp_password">Contraseña Temporal</label>
+                <input type="text" id="temp_password" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            <button type="submit" class="container-btn-file" style="margin-top: 10px;">Crear Usuario</button>
+        </form>
       </div>
+    </div>
     </div>      
     </main>
 

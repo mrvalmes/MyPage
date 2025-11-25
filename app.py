@@ -35,6 +35,11 @@ def create_app(config_name=None):
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp)
 
+    @app.route('/change-password')
+    def change_password_page():
+        from flask import render_template
+        return render_template('change_password.html')
+
     # Contexto de la aplicación para operaciones de BD fuera de las rutas
     with app.app_context():
         db.create_all() # Asegura que las tablas existen al iniciar la app si no están

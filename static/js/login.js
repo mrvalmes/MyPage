@@ -16,6 +16,11 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         if (response.ok) {
             localStorage.setItem('token', data.access_token);
             
+            if (data.force_password_change) {
+                window.location.href = '/change-password';
+                return;
+            }
+
             // Redirigir según el rol del usuario
             const nivel = data.nivel;
             
