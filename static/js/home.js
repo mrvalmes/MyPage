@@ -113,51 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error fetching sales overview:', error));
     }
 
-    function fetchTopVentasCC() {
-        fetch('/api/top_ventas_cc')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const tbody = document.querySelector('#top-empleados-cc tbody');
-                if (tbody) {
-                    tbody.innerHTML = ''; // Limpiar tabla existente
-                    if (data && data.length > 0) {
-                        data.forEach((vendedor, index) => {
-                            const row = document.createElement('tr');
-                            
-                            const nombreCell = document.createElement('td');
-                            nombreCell.textContent = vendedor.nombre;
-                            
-                            const totalCell = document.createElement('td');
-                            totalCell.textContent = vendedor.total_pav;
-                            
-                            const posicionCell = document.createElement('td');
-                            posicionCell.textContent = index + 1;
-                            
-                            row.appendChild(nombreCell);
-                            row.appendChild(totalCell);
-                            row.appendChild(posicionCell);
-                            tbody.appendChild(row);
-                        });
-                    } else {
-                        tbody.innerHTML = '<tr><td colspan="3">No hay datos disponibles.</td></tr>';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching top ventas CC:', error);
-                const tbody = document.querySelector('#top-empleados-cc tbody');
-                if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="3">Error al cargar datos.</td></tr>';
-                }
-            });
-    }
-
     fetchRecentActivity();
     fetchSalesOverview();
-    fetchTopVentasCC();
+    // fetchTopVentasCC removed - handled by index.js
 });

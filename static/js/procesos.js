@@ -162,6 +162,33 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
+    // Modal Logic
+    const modal = document.getElementById("userModal");
+    const btnOpen = document.getElementById("btnOpenUserModal");
+    const spanClose = document.getElementsByClassName("close")[0];
+
+    if (btnOpen) {
+        btnOpen.onclick = function() {
+            modal.style.display = "flex";
+            // Add class for animation if needed, e.g., modal.classList.add('show');
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+    }
+
+    if (spanClose) {
+        spanClose.onclick = function() {
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = "none", 300);
+        }
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = "none", 300);
+        }
+    }
+
     // Crear Usuario Admin
     const createUserForm = document.getElementById('createUserForm');
     if (createUserForm) {
@@ -197,6 +224,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (response.ok) {
                     alert(data.msg);
                     createUserForm.reset();
+                    // Close modal
+                    if (modal) {
+                        modal.classList.remove('show');
+                        setTimeout(() => modal.style.display = "none", 300);
+                    }
                 } else {
                     alert(data.msg || "Error al crear usuario");
                 }

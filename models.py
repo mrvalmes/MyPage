@@ -41,8 +41,8 @@ class UsuariosLogin(db.Model):
     def tiene_permiso(self, ruta: str) -> bool:
         """Verifica si el usuario tiene permiso para acceder a una ruta"""
         permisos = {
-            RolUsuario.ADMIN: ['home', 'dashboard', 'posiciones', 'comisiones', 'procesos', 'mantenimientos'],
-            RolUsuario.SUPERVISOR: ['home', 'dashboard', 'posiciones', 'comisiones'],
+            RolUsuario.ADMIN: ['home', 'dashboard', 'posiciones', 'comisiones', 'procesos', 'mantenimientos', 'audios'],
+            RolUsuario.SUPERVISOR: ['home', 'dashboard', 'posiciones', 'comisiones', 'audios'],
             RolUsuario.VENTAS: ['dashboard', 'comisiones', 'posiciones']
         }
         return ruta in permisos.get(self.nivel_acceso, [])

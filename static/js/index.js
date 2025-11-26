@@ -15,10 +15,32 @@ function renderTopVentas(tableSelector, data) {
 
     tbody.innerHTML = ''; // limpiar
 
-    data.forEach((item, index) => {
-        const raw = item[0] || "";  
-        const vendedor = raw.length > 10 ? raw.substring(10) : raw;
-        const totalPav = item[1] ?? 0;
+    // Asegurar que data es un array
+    if (!Array.isArray(data)) {
+        console.error("Data no es un array:", data);
+        return;
+    }
+
+    // Ordenar por total_pav descendente (por si acaso) y tomar top 10
+    const top10 = data
+        .sort((a, b) => (b.total_pav || 0) - (a.total_pav || 0))
+        .slice(0, 10);
+
+    top10.forEach((item, index) => {
+        // Manejar tanto formato array [nombre, val] como objeto {nombre, total_pav}
+        let rawName = "";
+        let total = 0;
+
+        if (Array.isArray(item)) {
+            rawName = item[0] || "";
+            total = item[1] ?? 0;
+        } else {
+            rawName = item.nombre || "";
+            total = item.total_pav ?? 0;
+        }
+
+        // Limpiar nombre: omitir los primeros 10 caracteres si es largo
+        const vendedor = rawName.length > 10 ? rawName.substring(10) : rawName;
         const pos = index + 1;
 
         const tr = document.createElement('tr');
@@ -27,7 +49,7 @@ function renderTopVentas(tableSelector, data) {
                 <img src="static/images/logo.png" alt="vendedor">
                 <p>${vendedor}</p>
             </td>
-            <td>${totalPav}</td>
+            <td>${total}</td>
             <td><span class="${getStatusClass(100)}">${pos}</span></td>
         `;
         tbody.appendChild(tr);
@@ -59,16 +81,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("conversion-value").textContent = cr + '%';
     })
     .catch(err => console.error("Error fetch métricas:", err));
-
-    /* Cargar top ventas normal
-    fetch(topVentasUrl)
-        .then(r => r.ok ? r.json() : Promise.reject('Error en top_ventas'))
-        .then(data => renderTopVentas('#top-empleados', data))
-        .catch(err => console.error(err));*/
-
+    
+    
     // Cargar top ventas CC
     fetch(topVentasCCUrl)
         .then(r => r.ok ? r.json() : Promise.reject('Error en top_ventas_cc'))
         .then(data => renderTopVentas('#top-empleados-cc', data))
-        .catch(err => console.error(err));
+        .catch(err => console.error('Error cargando Top CC:', err));
 });

@@ -56,3 +56,10 @@ def posiciones():
 def procesos():
     return render_template("procesos.html")
 
+@main_bp.route("/audios")
+@jwt_required()
+@require_active_single_session
+@require_route_access('audios')  # ADMIN, SUPERVISOR
+def audios():
+    return render_template("Audios.html")
+

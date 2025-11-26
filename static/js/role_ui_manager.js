@@ -117,7 +117,8 @@ function hideMenusByRole(nivel) {
     const menuItems = {
         'home': null,
         'procesos': null,
-        'mantenimientos': null
+        'mantenimientos': null,
+        'audios': null
     };
     
     // Encontrar los enlaces correctos
@@ -126,18 +127,21 @@ function hideMenusByRole(nivel) {
         if (href && href.includes('home')) menuItems.home = link;
         if (href && href.includes('procesos')) menuItems.procesos = link;
         if (href && href.includes('Mantenimientos')) menuItems.mantenimientos = link;
+        if (href && href.includes('audios')) menuItems.audios = link;
     });
     
     if (nivel === 'ventas') {
-        // Ocultar Home, Procesos y Mantenimientos para VENTAS
+        // Ocultar Home, Procesos, Mantenimientos y Audios para VENTAS
         if (menuItems.home) menuItems.home.parentElement.style.display = 'none';
         if (menuItems.procesos) menuItems.procesos.parentElement.style.display = 'none';
         if (menuItems.mantenimientos) menuItems.mantenimientos.parentElement.style.display = 'none';
+        if (menuItems.audios) menuItems.audios.parentElement.style.display = 'none';
         console.log('Menús ocultados para usuario VENTAS');
     } else if (nivel === 'supervisor') {
         // Ocultar Procesos y Mantenimientos para SUPERVISOR
         if (menuItems.procesos) menuItems.procesos.parentElement.style.display = 'none';
         if (menuItems.mantenimientos) menuItems.mantenimientos.parentElement.style.display = 'none';
+        // Audios es visible para Supervisor
         console.log('Menús ocultados para usuario SUPERVISOR');
     }
     // ADMIN ve todo, no ocultar nada
