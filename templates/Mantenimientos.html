@@ -96,6 +96,7 @@
                         </button>
                     </span>
                 </li>
+                <!--
                 <li><i class='bx bx-store'></i>
                     <span class="info">
                         <button class="button" id="btn-tiendas">
@@ -109,7 +110,7 @@
                             <div class="text">Ventas</div>
                         </button>
                     </span>
-                </li>
+                </li>-->
             </ul>
             <!--Selector de Empleado Fin-->
 
@@ -117,55 +118,55 @@
             <div id="modal-empleados" class="modal">                
                 <form class="form" id="createUserForm">  
                     <span class="close">&times;</span>
-                    <p class="title">Mantenimientos Usuarios </p>
-                    <p class="message">Crear Nuevo Usuario</p>
+                    <p class="title">Crear Nuevo Usuario </p>
+                    <p class="message">Campos marcados con * son obligatorios</p>
                     
                     <label>
                         <input class="input" type="email" id="new_usuario" placeholder="" required="">
-                        <span>Usuario (Email)</span>
+                        <span>Usuario (Email) *</span>
                     </label>              
                     
                     <label>
-                        <input class="input" type="text" id="new_codigo_usuario" placeholder="">
-                        <span>Código Empleado (Opcional)</span>
+                        <input class="input" type="number" id="new_codigo_usuario" placeholder="" required="">
+                        <span>Código Empleado *</span>
                     </label>
 
                     <label>
                         <select class="input" id="new_nivel" required>
-                            <option value="" disabled selected>Seleccione un rol...</option>
+                            <option value="" disabled selected>Seleccione un rol..</option>
                             <option value="admin">Administrador</option>
                             <option value="supervisor">Supervisor</option>
                             <option value="ventas">Ventas</option>
                         </select>
-                        <span>Rol</span>
+                        <span>Rol *</span>
                     </label>
                 
                     <label>
-                        <input class="input" type="text" id="temp_password" placeholder="" required="">
-                        <span>Contraseña Temporal</span>
+                        <input class="input" type="password" id="temp_password" required="">
+                        <span>Contraseña Temporal *</span>
                     </label>
 
                     <button class="submit" type="submit">Crear Usuario</button>                    
                 </form>                 
             </div>
             
-            <!-- Modal para Tiendas-->
+            <!-- Modal para Tiendas
             <div id="modal-tiendas" class="modal">
                 <div class="modal-content">
                     <span class="close">&times;</span>
                     <h2>Formulario de Tiendas</h2>
-                    <!-- Aquí va tu formulario para tiendas-->
+                    #Aquí va tu formulario para tiendas
                     <form>
                         <label for="tienda">Nombre de la Tienda:</label>
                         <input type="text" id="tienda" name="tienda">
-                        <!-- Más campos del formulario -->
+                        #Más campos del formulario
                         <button type="submit">Guardar</button>
                     </form>
                 </div>
-            </div>
+            </div>-->
             
 
-            <!-- Tarjetas -->
+            <!-- Tarjetas 
             <ul class="insights">
                 <li>
                     <i class='bx bx-calendar-check'></i>
@@ -193,7 +194,7 @@
                     </span>
                 </li>
             </ul>
-            <!--Fin tarjetas -->  
+            Fin tarjetas -->  
         </main>
 
     </div> 

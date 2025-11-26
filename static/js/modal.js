@@ -1,12 +1,12 @@
 // Obtener los elementos del DOM
 var modalEmpleados = document.getElementById("modal-empleados");
-var modalTiendas = document.getElementById("modal-tiendas");
+//var modalTiendas = document.getElementById("modal-tiendas");
 
 var btnEmpleados = document.getElementById("btn-empleados");
-var btnTiendas = document.getElementById("btn-tiendas");
+//var btnTiendas = document.getElementById("btn-tiendas");
 
 var spanEmpleados = modalEmpleados.getElementsByClassName("close")[0];
-var spanTiendas = modalTiendas.getElementsByClassName("close")[0];
+//var spanTiendas = modalTiendas.getElementsByClassName("close")[0];
 
 // Cuando el usuario hace clic en el botón, abre el modal correspondiente
 btnEmpleados.onclick = function () {
@@ -17,9 +17,9 @@ btnEmpleados.onclick = function () {
     }, 10);
 }
 
-btnTiendas.onclick = function () {
-    modalTiendas.style.display = 'flex';
-}
+//btnTiendas.onclick = function () {
+//    modalTiendas.style.display = 'flex';
+//}
 
 // Cuando el usuario hace clic en la 'x', cierra el modal
 spanEmpleados.onclick = function () {
@@ -30,9 +30,9 @@ spanEmpleados.onclick = function () {
     }, 250); // Mismo tiempo que la duración de la transición (0.3s)
 }
 
-spanTiendas.onclick = function () {
-    modalTiendas.style.display = "none";
-}
+//spanTiendas.onclick = function () {
+//    modalTiendas.style.display = "none";
+//}
 
 // Logic for Create User Form
 const createUserForm = document.getElementById('createUserForm');
