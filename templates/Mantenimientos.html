@@ -11,10 +11,14 @@
     <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modalStyle.css') }}">
-    <title>HeromovilApp</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loader.css') }}">
+    <title>Heromovilapp</title>
 </head>
 
 <body>
+    <div class="loader-container" id="loader">
+        <div class="loader"></div>
+    </div>
     <!-- Sidebar -->
     <div class="sidebar close">
         <a href="#" class="logo">
@@ -23,14 +27,12 @@
         </a>
         <ul class="side-menu">
             <li><a href="{{ url_for('main.home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>            
-            <li><a href="{{ url_for('main.dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
-            <li class="active"><a href="{{ url_for('main.mantenimientos') }}"><i class='bx bx-atom'></i>Mantenimientos</a> </li>
+            <li><a href="{{ url_for('main.dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>            
             <li><a href="{{ url_for('main.comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
             <li><a href="{{ url_for('main.posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
-            <li><a href="{{ url_for('main.procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
-            <!--<li><a href="#"><i class='bx bx-message-square-dots'></i>Tickets</a></li>
-            <li><a href="#"><i class='bx bx-group'></i>Usuarios</a></li>
-            <li><a href="#"><i class='bx bx-cog'></i>Configuracion</a></li>-->
+            <li><a href="{{ url_for('main.procesos') }}"><i class='bx bx-atom'></i>Procesos</a></li> 
+            <li class="active"><a href="{{ url_for('main.mantenimientos') }}"><i class='bx bx-cog'></i>Mantenimientos</a></li>          
+            <li><a href="{{ url_for('main.audios') }}"><i class='bx bx-music'></i>Audios</a></li>
         </ul>
         <ul class="side-menu">
             <li>
@@ -81,10 +83,6 @@
                         <li><a href="#" class="active">Miselaneos</a></li>
                     </ul>
                 </div>
-                <!--<a href="#" class="report">
-                    <i class='bx bx-cloud-download'></i>
-                    <span>Download CSV</span>
-                </a>-->
             </div>
             <!-- End of info -->
 
@@ -117,64 +115,37 @@
 
             <!-- Modal para Usuarios -->            
             <div id="modal-empleados" class="modal">                
-                <form class="form" method="dialog">  
+                <form class="form" id="createUserForm">  
                     <span class="close">&times;</span>
                     <p class="title">Mantenimientos Usuarios </p>
-                    <p class="message">Datos del Empleado</p>
+                    <p class="message">Crear Nuevo Usuario</p>
                     
-                        <label>
-                            <input class="input" type="text" placeholder="" required="">
-                            <span>Nombre Completo</span>
-                        </label>              
+                    <label>
+                        <input class="input" type="email" id="new_usuario" placeholder="" required="">
+                        <span>Usuario (Email)</span>
+                    </label>              
                     
-                    <div class="flex">
-                        <label>
-                            <input class="input" type="text" placeholder="" required="">
-                            <span>ID Trivision</span>
-                        </label>
+                    <label>
+                        <input class="input" type="text" id="new_codigo_usuario" placeholder="">
+                        <span>Código Empleado (Opcional)</span>
+                    </label>
 
-                        <label>
-                            <input class="input" type="text" placeholder="" required="">
-                            <span>ID Localidad</span>
-                        </label>
-                    </div>
+                    <label>
+                        <select class="input" id="new_nivel" required>
+                            <option value="" disabled selected>Seleccione un rol...</option>
+                            <option value="admin">Administrador</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="ventas">Ventas</option>
+                        </select>
+                        <span>Rol</span>
+                    </label>
                 
                     <label>
-                        <input class="input" type="email" placeholder="" required="">
-                        <span>Email</span>
-                    </label>
-                
-                    <label>
-                        <input class="input" type="password" placeholder="" required="">
-                        <span>Contraseña</span>
+                        <input class="input" type="text" id="temp_password" placeholder="" required="">
+                        <span>Contraseña Temporal</span>
                     </label>
 
-                    <label>
-                        <input class="input" type="password" placeholder="" required="">
-                        <span>Confirma Contraseña</span>
-                    </label>
-
-                    <div class="flex">
-                    <label>
-                        <select class="input">
-                            <option value="Supervisor">Supervisor</option>
-                            <option value="Ventas" selected>Ventas</option>
-                            <option value="Administracion">Administracion</option>
-                        </select>
-                        <span>Puesto</span>
-                    </label>
-
-                    <label>
-                        <select class="input">
-                            <option value="3" selected>Ventas</option>
-                            <option value="2">Supervisor</option>                            
-                            <option value="1">Administracion</option>
-                        </select>
-                        <span>Nivel Acceso</span>
-                    </label>
-                    </div>
-
-                    <button class="submit">Guardar</button>                    
+                    <button class="submit" type="submit">Crear Usuario</button>                    
                 </form>                 
             </div>
             

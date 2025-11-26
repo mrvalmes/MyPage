@@ -161,85 +161,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Ocurrió un error al procesar la solicitud.');
             });
     });
-
-    // Modal Logic
-    const modal = document.getElementById("userModal");
-    const btnOpen = document.getElementById("btnOpenUserModal");
-    const spanClose = document.getElementsByClassName("close")[0];
-
-    if (btnOpen) {
-        btnOpen.onclick = function() {
-            modal.style.display = "flex";
-            // Add class for animation if needed, e.g., modal.classList.add('show');
-            setTimeout(() => modal.classList.add('show'), 10);
-        }
-    }
-
-    if (spanClose) {
-        spanClose.onclick = function() {
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = "none", 300);
-        }
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = "none", 300);
-        }
-    }
-
-    // Crear Usuario Admin
-    const createUserForm = document.getElementById('createUserForm');
-    if (createUserForm) {
-        createUserForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const usuario = document.getElementById('new_usuario').value;
-            const codigo_usuario = document.getElementById('new_codigo_usuario').value;
-            const nivel = document.getElementById('new_nivel').value;
-            const temp_password = document.getElementById('temp_password').value;
-
-            showLoader();
-
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('/api/admin/create-user', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify({
-                        usuario,
-                        codigo_usuario,
-                        nivel,
-                        temp_password
-                    })
-                });
-
-                const data = await response.json();
-                hideLoader();
-
-                if (response.ok) {
-                    alert(data.msg);
-                    createUserForm.reset();
-                    // Close modal
-                    if (modal) {
-                        modal.classList.remove('show');
-                        setTimeout(() => modal.style.display = "none", 300);
-                    }
-                } else {
-                    alert(data.msg || "Error al crear usuario");
-                }
-            } catch (error) {
-                hideLoader();
-                console.error("Error:", error);
-                alert("Error de conexión");
-            }
-        });
-    }
 });
+
+
 // Se necesita la librería xlsx.js para la validación de cabeceras
 const script = document.createElement('script');
 script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js';

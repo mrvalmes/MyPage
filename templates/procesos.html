@@ -23,11 +23,13 @@
             <div class="logo-name"><span>Hero</span>Movil</div>
         </a>
         <ul class="side-menu">
-            <li><a href="{{ url_for('main.home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>
-            <li><a href="{{ url_for('main.dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>
+            <li><a href="{{ url_for('main.home') }}"><i class='bx bxs-dashboard'></i>Inicio</a></li>            
+            <li><a href="{{ url_for('main.dashboard') }}"><i class='bx bx-analyse'></i>Analiticas</a></li>            
             <li><a href="{{ url_for('main.comisiones') }}"><i class='bx bx-dollar'></i>Comisiones</a></li>
             <li><a href="{{ url_for('main.posiciones') }}"><i class='bx bx-group'></i>Posiciones</a></li>
-            <li class="active"><a href="{{ url_for('main.procesos') }}"><i class='bx bx-cog'></i>Procesos</a></li>
+            <li class="active"><a href="{{ url_for('main.procesos') }}"><i class='bx bx-atom'></i>Procesos</a></li> 
+            <li><a href="{{ url_for('main.mantenimientos') }}"><i class='bx bx-cog'></i>Mantenimientos</a></li>          
+            <li><a href="{{ url_for('main.audios') }}"><i class='bx bx-music'></i>Audios</a></li>
         </ul>
         <ul class="side-menu">
             <li>
@@ -217,51 +219,6 @@
         </div>
       </div>
 
-    <div class="bottom-data">
-      <div class="orders">
-        <div class="header">
-          <h3>Gestión de Usuarios</h3>
-        </div>
-        <button id="btnOpenUserModal" class="container-btn-file" style="width: fit-content;">
-            <i class='bx bx-user-plus' style="margin-right: 10px; font-size: 1.2rem;"></i>
-            Crear Nuevo Usuario
-        </button>
-      </div>
-    </div>
-
-    <!-- Modal for Create User -->
-    <div id="userModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div class="header" style="margin-bottom: 20px;">
-                <h3>Crear Nuevo Usuario</h3>
-            </div>
-            <form id="createUserForm" style="display: flex; flex-direction: column; gap: 15px;">
-                <div class="form-group">
-                    <label for="new_usuario">Usuario (Email)</label>
-                    <input type="email" id="new_usuario" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: var(--grey); color: var(--dark);">
-                </div>
-                <div class="form-group">
-                    <label for="new_codigo_usuario">Código Empleado (Opcional)</label>
-                    <input type="text" id="new_codigo_usuario" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: var(--grey); color: var(--dark);">
-                </div>
-                <div class="form-group">
-                    <label for="new_nivel">Rol</label>
-                    <select id="new_nivel" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: var(--grey); color: var(--dark);">
-                        <option value="" disabled selected>Seleccione un rol...</option>
-                        <option value="admin">Administrador</option>
-                        <option value="supervisor">Supervisor</option>
-                        <option value="ventas">Ventas</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="temp_password">Contraseña Temporal</label>
-                    <input type="text" id="temp_password" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; background: var(--grey); color: var(--dark);">
-                </div>
-                <button type="submit" class="container-btn-file" style="margin-top: 10px; width: 100%;">Crear Usuario</button>
-            </form>
-        </div>
-    </div>
     </div>      
     </main>
 
