@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const url = `/api/conversion-rate?empleado_id=${encodeURIComponent(supervisor)}&dia=${encodeURIComponent(dia)}`;
-    console.log('Solicitando datos CR:', url);
 
     // Opcional: muestra fila de "cargando"
     if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Cargando...</td></tr>';

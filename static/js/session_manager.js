@@ -61,6 +61,4 @@
         window.location.href = '/';
     }
     
-    // Log para debugging (remover en producción si es necesario)
-    console.log('Session manager initialized - monitoring for HTTP 440 responses');
 })();

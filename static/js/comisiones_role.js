@@ -16,7 +16,6 @@ async function initComisionesRole() {
         if (!response.ok) return;
         
         const userInfo = await response.json();
-        console.log('Usuario en comisiones:', userInfo);
         
         // Si es VENTAS, filtrar dropdown
         if (userInfo.nivel === 'ventas') {
@@ -37,8 +36,6 @@ async function initComisionesRole() {
                 empleadoSelect.disabled = true;
                 empleadoSelect.style.opacity = '0.5';
                 empleadoSelect.style.cursor = 'not-allowed';
-                
-                console.log('Dropdown de comisiones filtrado para VENTAS');
             }
         }
     } catch (error) {

@@ -18,7 +18,6 @@ async function loadUserInfo() {
         
         if (response.ok) {
             currentUserInfo = await response.json();
-            console.log('Usuario actual:', currentUserInfo);
         }
     } catch (error) {
         console.error('Error al cargar info de usuario:', error);
@@ -106,8 +105,6 @@ function updateProfileImage() {
             infoContainer.appendChild(roleSpan);
         }
         roleSpan.textContent = currentUserInfo.nivel || 'Usuario';
-        
-        console.log('Perfil actualizado con imagen y datos');
     }
 }
 
@@ -136,13 +133,11 @@ function hideMenusByRole(nivel) {
         if (menuItems.procesos) menuItems.procesos.parentElement.style.display = 'none';
         if (menuItems.mantenimientos) menuItems.mantenimientos.parentElement.style.display = 'none';
         if (menuItems.audios) menuItems.audios.parentElement.style.display = 'none';
-        console.log('Menús ocultados para usuario VENTAS');
     } else if (nivel === 'supervisor') {
         // Ocultar Procesos y Mantenimientos para SUPERVISOR
         if (menuItems.procesos) menuItems.procesos.parentElement.style.display = 'none';
         if (menuItems.mantenimientos) menuItems.mantenimientos.parentElement.style.display = 'none';
         // Audios es visible para Supervisor
-        console.log('Menús ocultados para usuario SUPERVISOR');
     }
     // ADMIN ve todo, no ocultar nada
 }

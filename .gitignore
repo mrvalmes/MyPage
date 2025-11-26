@@ -67,6 +67,7 @@ backUp/
 revisar/
 tmp/
 temp/
+TestOld/
 
 # Excel temporary files
 ~$*.xlsx

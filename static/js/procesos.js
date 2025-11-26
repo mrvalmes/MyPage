@@ -94,10 +94,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Filtrar valores nulos o vacíos de la cabecera leída
                 const cleanedHeader = header.filter(h => h);
 
-                console.log("Cabecera esperada:", expectedHeaders);
-                console.log("Cabecera extraída (cruda):", header);
-                console.log("Cabecera extraída (limpia):", cleanedHeader);
-
                 if (JSON.stringify(cleanedHeader) !== JSON.stringify(expectedHeaders)) {
                     alert('Las cabeceras del archivo no coinciden con las esperadas para el tipo de carga seleccionado.');
                     inputArchivo.value = '';

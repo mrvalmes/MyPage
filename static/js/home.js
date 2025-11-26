@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(salesOverviewData => {
                 const chartElement = document.getElementById('salesOverviewChart');
                 if (!chartElement) {
-                    console.log('salesOverviewChart no encontrado en esta página');
                     return;
                 }
                 

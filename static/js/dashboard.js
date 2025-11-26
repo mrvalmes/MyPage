@@ -26,7 +26,6 @@ async function loadCurrentUser() {
         
         if (response.ok) {
             userInfo = await response.json();
-            console.log('Usuario dashboard:', userInfo);
         }
     } catch (error) {
         console.error('Error al cargar usuario:', error);
@@ -102,7 +101,6 @@ function adjustDashboardByRole() {
         selectEmpleado.style.cursor = 'not-allowed';
         
         // Cargar automáticamente sus datos
-        console.log('Cargando datos para vendedor:', userInfo.codigo_usuario);
         
         // Recargar el chart con los datos del empleado
         if (typeof fetchAndRenderChart === 'function') {

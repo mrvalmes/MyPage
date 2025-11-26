@@ -48,4 +48,6 @@ def create_app(config_name=None):
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    # SECURITY: Set debug=False in production
+    # Also update JWT_COOKIE_SECURE=True and JWT_COOKIE_CSRF_PROTECT=True when using HTTPS
+    app.run(debug=False)

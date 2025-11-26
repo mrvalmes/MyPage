@@ -86,8 +86,6 @@ async function cargarEmpleados() {
             option.textContent = `${emp.id} - ${emp.nombre} (${emp.puesto})`;
             select.appendChild(option);
         });
-        
-        console.log(`✅ ${empleados.length} empleados cargados`);
     } catch (error) {
         console.error('Error al cargar empleados:', error);
         alert('No se pudo cargar la lista de empleados');
