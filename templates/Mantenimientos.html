@@ -3,8 +3,30 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <script src="{{ url_for('static', filename='js/session_manager.js') }}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <script>
+    (function(){
+        var t=localStorage.getItem('darkMode');
+        if(t==='true'){            
+            var applyTheme=function(){
+                if(document.body){
+                    document.body.classList.add('dark');
+                }else{
+                    setTimeout(applyTheme,1);
+                }
+            };
+            applyTheme();
+        }
+    })();
+    </script>    
+    <script>(function(){
+        var u=localStorage.getItem('userInfo');
+        if(u){try{
+            var user=JSON.parse(u);
+            window.__userInfo=user;
+            }catch(e){}}})();
+    </script>
+<script src="{{ url_for('static', filename='js/session_manager.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js"></script>    
     <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    
@@ -52,10 +74,7 @@
             <i class='bx bx-menu'></i>
 
             <form action="#">
-                <div class="form-input">
-                    <input type="search" placeholder="Buscar...">
-                    <button class="search-btn" type="submit"><i class='bx bx-search'></i></button>
-                </div>
+                <div class="dateTime" id="clock"></div>
             </form>
 
             <label for="switch" class="switch">
@@ -64,11 +83,24 @@
                 <span class="decoration"></span>
             </label>
 
-            <a href="#" class="profile">
-                <img src="/static/images/logo.png">
-            </a>
+            <div class="profile">
+                <img src="/static/images/logo.png" id="profile-img">
+            </div>
         </nav>
-        <!-- End of Navbar -->
+            <!-- Apply profile image immediately -->
+    <script>(function(){
+        if(window.__userInfo)
+        {var u=window.__userInfo;
+        var img=document.getElementById('profile-img');
+        if(img&&u.codigo_usuario)
+        {img.src='/static/images/'+u.codigo_usuario+'.jpg';
+        img.onerror=function()
+        {
+            this.src='/static/images/logo.png';this.onerror=null;
+        };}}})();
+    </script>
+
+<!-- End of Navbar -->
         
         <!--Info-->
         <main>
@@ -96,21 +128,6 @@
                         </button>
                     </span>
                 </li>
-                <!--
-                <li><i class='bx bx-store'></i>
-                    <span class="info">
-                        <button class="button" id="btn-tiendas">
-                            <div class="text">Tiendas</div>
-                        </button>
-                    </span>
-                </li>
-                <li><i class='bx bx-dollar-circle'></i>
-                    <span class="info">
-                        <button class="button" id="btn-ventas">
-                            <div class="text">Ventas</div>
-                        </button>
-                    </span>
-                </li>-->
             </ul>
             <!--Selector de Empleado Fin-->
 
@@ -140,65 +157,28 @@
                         </select>
                         <span>Rol *</span>
                     </label>
-                
+
                     <label>
                         <input class="input" type="password" id="temp_password" required="">
                         <span>Contraseña Temporal *</span>
                     </label>
-
+                    
                     <button class="submit" type="submit">Crear Usuario</button>                    
                 </form>                 
-            </div>
-            
-            <!-- Modal para Tiendas
-            <div id="modal-tiendas" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>Formulario de Tiendas</h2>
-                    #Aquí va tu formulario para tiendas
-                    <form>
-                        <label for="tienda">Nombre de la Tienda:</label>
-                        <input type="text" id="tienda" name="tienda">
-                        #Más campos del formulario
-                        <button type="submit">Guardar</button>
-                    </form>
-                </div>
-            </div>-->
-            
-
-            <!-- Tarjetas 
-            <ul class="insights">
-                <li>
-                    <i class='bx bx-calendar-check'></i>
-                    <span class="info">
-                        <h3 id="pav-value">0</h3>
-                        <p>PAV</p>
-                    </span>
-                </li>
-                <li><i class='bx bx-show-alt'></i>
-                    <span class="info">
-                    <h3 id="clientes-value">0</h3>
-                    <p>Clientes Atendidos(Pagos)</p>                    
-                    </span>
-                </li>
-                <li><i class='bx bx-line-chart'></i>
-                    <span class="info">
-                        <h3 id="conversion-value">0%</h3>
-                        <p>Conversion</p>                        
-                    </span>
-                </li>
-                <li><i class='bx bx-dollar-circle'></i>
-                    <span class="info">
-                    <h3 id="comision-value">$0</h3>
-                    <p>Comision</p>
-                    </span>
-                </li>
-            </ul>
-            Fin tarjetas -->  
+            </div>            
         </main>
 
     </div> 
     <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/role_ui_manager.js') }}"></script>
     <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/Clock.js') }}"></script>
+    <script>
+        // Initialize clock
+        window.addEventListener('DOMContentLoaded', function() {
+            getthedate();
+            goforit();
+        });
+    </script>
 </body>
 </html>

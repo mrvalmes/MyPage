@@ -18,6 +18,8 @@ async function loadUserInfo() {
         
         if (response.ok) {
             currentUserInfo = await response.json();
+            // Guardar en localStorage para uso inmediato en próximas cargas
+            localStorage.setItem('userInfo', JSON.stringify(currentUserInfo));
         }
     } catch (error) {
         console.error('Error al cargar info de usuario:', error);

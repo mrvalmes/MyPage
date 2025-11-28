@@ -41,7 +41,7 @@
 }
 
 /* Botón para cerrar el modal */
-.close {
+.modal .close {
     color: #aaa;
     position: absolute;
     top: 10px;

@@ -4,7 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Theme initialization - prevents flash -->
+    <script>
+    (function(){
+        var t=localStorage.getItem('darkMode');
+        if(t==='true'){
+            // Usar un intervalo muy corto para aplicar apenas el body esté disponible
+            var applyTheme=function(){
+                if(document.body){
+                    document.body.classList.add('dark');
+                }else{
+                    setTimeout(applyTheme,1);
+                }
+            };
+            applyTheme();
+        }
+    })();
+    </script>
+    <!-- Profile initialization - prevents flash -->
+    <script>(function(){var u=localStorage.getItem('userInfo');if(u){try{var user=JSON.parse(u);window.__userInfo=user;}catch(e){}}})();</script>
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">        
     <title>HeromovilApp</title>
@@ -45,10 +64,7 @@
         <nav>
             <i class='bx bx-menu'></i>
             <form action="#">
-                <div class="form-input">
-                    <input type="search" placeholder="Search...">
-                    <button class="search-btn" type="submit"><i class='bx bx-search'></i></button>
-                </div>
+                <div class="dateTime" id="clock"></div>
             </form>
             <label for="switch" class="switch">
                 <input id="switch" type="checkbox" />
@@ -56,11 +72,14 @@
                 <span class="decoration"></span>
             </label>
             
-            <a href="#" class="profile">
-                <img src="/static/images/logo.png">
-            </a>
+            <div class="profile">
+                <img src="/static/images/logo.png" id="profile-img">
+            </div>
         </nav>
-        <!-- End of Navbar -->
+            <!-- Apply profile image immediately -->
+    <script>(function(){if(window.__userInfo){var u=window.__userInfo;var img=document.getElementById('profile-img');if(img&&u.codigo_usuario){img.src='/static/images/'+u.codigo_usuario+'.jpg';img.onerror=function(){this.src='/static/images/logo.png';this.onerror=null;};}}})();</script>
+
+<!-- End of Navbar -->
         
         <main>
             <div class="header">
@@ -116,6 +135,14 @@
 <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
 <script src="{{ url_for('static', filename='js/posiciones.js') }}"></script>
 <script src="{{ url_for('static', filename='js/role_ui_manager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/Clock.js') }}"></script>
+<script>
+    // Initialize clock
+    window.addEventListener('DOMContentLoaded', function() {
+        getthedate();
+        goforit();
+    });
+</script>
 </body>
 
 </html>

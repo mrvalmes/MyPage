@@ -323,6 +323,23 @@ ul{
     left: calc(100% - (25px - 4px) - 2px);
 }
 
+/* Clock styles */
+.content nav form .dateTime {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: var(--grey);
+    border-radius: 36px;
+    color: var(--dark);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.content nav form .dateTime font {
+    color: var(--dark);
+}
+
 .content main{
     width: 100%;
     padding: 36px 24px;
@@ -1306,7 +1323,7 @@ input[type="date"] {
     align-items: center;
     justify-content: flex-start;
     grid-gap: 10px;
-    margin-bottom: 10px;        /* Separación controlada */
+    margin-bottom: 10px;        
 }
 
 .reminders .header h3 {
@@ -1317,11 +1334,46 @@ input[type="date"] {
 
 /* Canvas del gráfico */
 #salesOverviewChart {
-    width: 100%;                 /* Tamaño adaptable al ancho */
-    max-width: 350px;           /* Tamaño máximo del gráfico */
+    width: 100%;                 
+    max-width: 350px;         
     height: auto;
-    flex-grow: 1;               /* Ocupa el espacio restante del contenedor */
+    flex-grow: 1;               
     display: block;
     margin: 0 auto;
-    margin-top: 10px;           /* Espaciado leve debajo del título */
+    margin-top: 10px;           
+}
+
+     
+/* Custom styles for Procesos page */
+.upload-container {
+display: flex;
+gap: 30px;
+align-items: flex-start;
+margin-bottom: 20px;
+}
+
+.upload-options {
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+
+.upload-options label {
+display: flex;
+align-items: center;
+gap: 10px;
+cursor: pointer;
+font-size: 16px;
+}
+
+.upload-actions {
+display: flex;
+flex-direction: column;
+gap: 15px;
+}              
+     
+.dateTime {
+    font-family: arial, helvetica, sans-serif;
+    float: left;
+    color: var(--dark);
 }
