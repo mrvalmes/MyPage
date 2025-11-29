@@ -1,10 +1,29 @@
 document.getElementById('loginForm').addEventListener('submit', async function (event) {
     event.preventDefault();
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = event.target.querySelector('.login-btn');
+    const loader = document.getElementById('loader');
+    
+    const email = emailInput.value;
+    const password = passwordInput.value;
+
+    // Guardar texto original del botón
+    const originalBtnText = loginBtn.textContent;
 
     try {
+        // Mostrar estado de carga
+        loginBtn.textContent = 'Iniciando sesión...';
+        loginBtn.disabled = true;
+        emailInput.disabled = true;
+        passwordInput.disabled = true;
+        
+        // Mostrar loader si existe
+        if (loader) {
+            loader.style.display = 'flex';
+        }
+
         const response = await fetch('/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -32,9 +51,29 @@ document.getElementById('loginForm').addEventListener('submit', async function (
                 window.location.href = '/home';
             }
         } else {
+            // Restaurar estado en caso de error
+            loginBtn.textContent = originalBtnText;
+            loginBtn.disabled = false;
+            emailInput.disabled = false;
+            passwordInput.disabled = false;
+            
+            if (loader) {
+                loader.style.display = 'none';
+            }
+            
             alert(data.msg || 'Error al iniciar sesión');
         }
     } catch (error) {
+        // Restaurar estado en caso de error
+        loginBtn.textContent = originalBtnText;
+        loginBtn.disabled = false;
+        emailInput.disabled = false;
+        passwordInput.disabled = false;
+        
+        if (loader) {
+            loader.style.display = 'none';
+        }
+        
         console.error('Error:', error);
         alert('Error al conectar con el servidor');
     }
