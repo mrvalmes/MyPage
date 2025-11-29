@@ -260,10 +260,15 @@ def incentivos():
         }
 
         objetivos_map = {
-            "Card": "sim_card_prepago", "Flex/Max": "flex_max", "Internet": "internet_pospago",
-            "Migraciones": "migraciones_pospago_net", "Fidepuntos Pos": "fidepuntos_pospago",
-            "Fidepuntos Up": "fidepuntos_up", "Reemplazo Pos": "reemplazo_pospago",
-            "Reemplazo Up": "reemplazo_up", "Fide Reemp Internet Up": "fide_reemp_internet_up",
+            "Card": "sim_card_prepago", 
+            "Flex/Max": "flex_max", 
+            "Internet": "internet_pospago",
+            "Migraciones": "migraciones_pospago_net", 
+            "Fidepuntos Pos": "fidepuntos_pospago",
+            "Fidepuntos Up": "fidepuntos_up", 
+            "Reemplazo Pos": "reemplazo_pospago",
+            "Reemplazo Up": "reemplazo_up", 
+            "Fide Reemp Internet Up": "fide_reemp_internet_up",
             "Aumentos": "aumentos_plan_pos_net",
         }
 
@@ -308,6 +313,7 @@ def incentivos():
             "logro": logro,
             "incentivo": comisiones,
         }
+        
         return jsonify(data)
     except Exception as e:
         import traceback
