@@ -505,7 +505,15 @@ def upload_pagos():
 @jwt_required()
 @require_active_single_session
 def api_generar_ventas():
-    result = generar_ventas_sqlalchemy()
+    # Obtener parámetro opcional del body
+    # Por defecto: procesa solo mes actual (process_all_months=False)
+    # Para procesar todo: enviar {"process_all_months": true}
+    # silent=True permite requests sin Content-Type: application/json
+    data = request.get_json(silent=True) or {}
+    process_all = data.get('process_all_months', False)
+    
+    result = generar_ventas_sqlalchemy(process_all_months=process_all)
+    
     if result.get("status") == "success":
         return jsonify(result), 200
     elif result.get("status") == "warning":

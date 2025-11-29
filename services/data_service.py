@@ -68,16 +68,50 @@ def process_and_save_pagos(file):
         db.session.rollback()
         raise e
 
-def generar_ventas_sqlalchemy():
+def generar_ventas_sqlalchemy(process_all_months=False):
+    """
+    Genera registros de VentasDetalle desde Transacciones.
+    
+    Args:
+        process_all_months (bool): Si es True, procesa todo el histórico.
+                                   Si es False (default), solo procesa el mes actual.
+    """
     try:
-        # 1. Limpiar la tabla VentasDetalle
-        db.session.query(VentasDetalle).delete()
-        db.session.commit()
-        print("Tabla VentasDetalle limpiada.")
+        from datetime import datetime
+        
+        # Obtener mes y año actual
+        current_year = datetime.now().year
+        current_month = datetime.now().month
+        
+        if process_all_months:
+            # Comportamiento original: limpiar toda la tabla
+            db.session.query(VentasDetalle).delete()
+            db.session.commit()
+            print("Tabla VentasDetalle limpiada completamente.")
+        else:
+            # Nuevo comportamiento: limpiar solo el mes actual
+            deleted_count = db.session.query(VentasDetalle).filter(
+                db.func.extract('year', VentasDetalle.fecha) == current_year,
+                db.func.extract('month', VentasDetalle.fecha) == current_month
+            ).delete(synchronize_session=False)
+            db.session.commit()
+            print(f"Registros de VentasDetalle del mes {current_month}/{current_year} eliminados: {deleted_count}")
 
         # 2. Leer datos necesarios
-        # Transacciones
-        transacciones_query = db.session.query(Transacciones).filter(Transacciones.estado_transaccion != 'Cancelada')
+        # Transacciones - filtrar por mes si no es process_all_months
+        transacciones_query = db.session.query(Transacciones).filter(
+            Transacciones.estado_transaccion != 'Cancelada'
+        )
+        
+        if not process_all_months:
+            # Filtrar solo transacciones del mes actual
+            transacciones_query = transacciones_query.filter(
+                db.func.extract('year', Transacciones.fecha_digitacion_orden) == current_year,
+                db.func.extract('month', Transacciones.fecha_digitacion_orden) == current_month
+            )
+            print(f"Procesando solo transacciones del mes {current_month}/{current_year}")
+        else:
+            print("Procesando todas las transacciones")
         df = pd.read_sql(transacciones_query.statement, db.session.connection())
         
         # Usuarios (Supervisores)
