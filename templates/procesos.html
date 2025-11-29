@@ -149,6 +149,53 @@
         </div>
       </div>
 
+      <!-- Reasignar Venta Section -->
+      <div class="bottom-data">
+        <div class="orders">
+          <div class="header">
+            <i class='bx bx-transfer'></i>
+            <h3>Reasignar Venta</h3>
+          </div>
+          
+          <div class="reassign-container" style="padding: 20px;">
+            <!-- Buscar Orden -->
+            <div class="search-order" style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 500;">ID Transacción:</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="inputIdTransaccion" placeholder="Ingrese ID de transacción" 
+                       style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <button id="btnBuscarOrden" class="container-btn-file" style="margin: 0;">Buscar Orden</button>
+              </div>
+            </div>
+            
+            <!-- Tabla de Resultados -->
+            <div id="ordenResultado" style="display:none;">
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <thead>
+                  <tr style="background-color: #f5f5f5;">
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Usuario Actual</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">ID Transacción</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Fecha</th>
+                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Razón Servicio</th>
+                  </tr>
+                </thead>
+                <tbody id="ordenData"></tbody>
+              </table>
+              
+              <!-- Reasignar -->
+              <div class="reassign-action">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Nuevo Usuario:</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <input type="text" id="inputNuevoUsuario" placeholder="Código de usuario" 
+                         style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                  <button id="btnActualizarUsuario" class="container-btn-file" style="margin: 0;">Actualizar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>      
     </main>
 

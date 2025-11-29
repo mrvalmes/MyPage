@@ -157,6 +157,109 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Ocurrió un error al procesar la solicitud.');
             });
     });
+
+    // ===== REASIGNAR VENTA =====
+    const btnBuscarOrden = document.getElementById('btnBuscarOrden');
+    const btnActualizarUsuario = document.getElementById('btnActualizarUsuario');
+    const inputIdTransaccion = document.getElementById('inputIdTransaccion');
+    const inputNuevoUsuario = document.getElementById('inputNuevoUsuario');
+    const ordenResultado = document.getElementById('ordenResultado');
+    const ordenData = document.getElementById('ordenData');
+
+    // Verificar que los elementos existen antes de agregar event listeners
+    if (!btnBuscarOrden || !btnActualizarUsuario || !inputIdTransaccion || !inputNuevoUsuario || !ordenResultado || !ordenData) {
+        console.error('Error: No se encontraron todos los elementos de Reasignar Venta');
+        return;
+    }
+
+    // Buscar Orden
+    btnBuscarOrden.addEventListener('click', function () {
+        const idTransaccion = inputIdTransaccion.value.trim();
+        
+        if (!idTransaccion) {
+            alert('Por favor ingrese un ID de transacción');
+            return;
+        }
+        
+        showLoader();
+        fetch(`/api/buscar_orden/${idTransaccion}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                hideLoader();
+                if (data.error) {
+                    alert(data.error);
+                    ordenResultado.style.display = 'none';
+                } else {
+                    mostrarOrden(data);
+                }
+            })
+            .catch(error => {
+                hideLoader();
+                console.error('Error:', error);
+                alert('Error al buscar la orden');
+            });
+    });
+
+    // Mostrar datos de la orden
+    function mostrarOrden(data) {
+        ordenData.innerHTML = `
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">${data.usuario_creo_orden}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${data.id_transaccion}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${data.fecha_digitacion_orden || 'N/A'}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">${data.razon_servicio}</td>
+            </tr>
+        `;
+        ordenResultado.style.display = 'block';
+        inputNuevoUsuario.value = ''; // Limpiar input de nuevo usuario
+    }
+
+    // Actualizar Usuario
+    btnActualizarUsuario.addEventListener('click', function () {
+        const idTransaccion = inputIdTransaccion.value.trim();
+        const nuevoUsuario = inputNuevoUsuario.value.trim();
+        
+        if (!nuevoUsuario) {
+            alert('Por favor ingrese el nuevo usuario');
+            return;
+        }
+        
+        if (!confirm(`¿Está seguro de reasignar la orden ${idTransaccion} al usuario ${nuevoUsuario}?`)) {
+            return;
+        }
+        
+        showLoader();
+        fetch(`/api/reasignar_venta/${idTransaccion}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({ nuevo_usuario: nuevoUsuario })
+        })
+            .then(response => response.json())
+            .then(data => {
+                hideLoader();
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(data.message);
+                    // Limpiar formulario
+                    inputIdTransaccion.value = '';
+                    inputNuevoUsuario.value = '';
+                    ordenResultado.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                hideLoader();
+                console.error('Error:', error);
+                alert('Error al actualizar la orden');
+            });
+    });
 });
 
 

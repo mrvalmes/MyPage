@@ -520,3 +520,78 @@ def api_generar_ventas():
         return jsonify(result), 200
     else:
         return jsonify(result), 500
+
+# Buscar Orden por ID
+@api_bp.route("/api/buscar_orden/<id_transaccion>", methods=["GET"])
+@jwt_required()
+@require_active_single_session
+def api_buscar_orden(id_transaccion):
+    """
+    Busca una orden por ID de transacción.
+    Retorna los datos de la orden para mostrar en la UI.
+    """
+    try:
+        from models import Transacciones
+        
+        orden = db.session.query(Transacciones).filter(
+            Transacciones.id_transaccion == id_transaccion
+        ).first()
+        
+        if not orden:
+            return jsonify({"error": "Orden no encontrada"}), 404
+        
+        return jsonify({
+            "usuario_creo_orden": orden.usuario_creo_orden,
+            "id_transaccion": orden.id_transaccion,
+            "fecha_digitacion_orden": orden.fecha_digitacion_orden.strftime("%Y-%m-%d") if orden.fecha_digitacion_orden else None,
+            "razon_servicio": orden.razon_servicio
+        }), 200
+    except Exception as e:
+        import traceback
+        print(f"Error en buscar_orden: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": f"Error al buscar orden: {str(e)}"}), 500
+
+# Reasignar Venta
+@api_bp.route("/api/reasignar_venta/<id_transaccion>", methods=["PUT"])
+@jwt_required()
+@require_active_single_session
+def api_reasignar_venta(id_transaccion):
+    """
+    Actualiza el usuario_creo_orden de una transacción.
+    """
+    try:
+        from models import Transacciones
+        
+        data = request.get_json(silent=True) or {}
+        nuevo_usuario = data.get('nuevo_usuario')
+        
+        if not nuevo_usuario:
+            return jsonify({"error": "Debe proporcionar un nuevo usuario"}), 400
+        
+        orden = db.session.query(Transacciones).filter(
+            Transacciones.id_transaccion == id_transaccion
+        ).first()
+        
+        if not orden:
+            return jsonify({"error": "Orden no encontrada"}), 404
+        
+        # Guardar usuario anterior para el log
+        usuario_anterior = orden.usuario_creo_orden
+        
+        # Actualizar usuario
+        orden.usuario_creo_orden = nuevo_usuario
+        db.session.commit()
+        
+        return jsonify({
+            "message": f"Orden {id_transaccion} reasignada de '{usuario_anterior}' a '{nuevo_usuario}'",
+            "id_transaccion": id_transaccion,
+            "usuario_anterior": usuario_anterior,
+            "nuevo_usuario": nuevo_usuario
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        print(f"Error en reasignar_venta: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": f"Error al reasignar venta: {str(e)}"}), 500
