@@ -278,25 +278,14 @@ def incentivos():
         for row in results_com_query:
             tv = row.tipo_venta
             suma_ventas = row.suma_ventas
-            comision_75 = row.comision_75_total
-            comision_100 = row.comision_100_total
+            comision_75 = float(row.comision_75_total) if row.comision_75_total is not None else 0
+            comision_100 = float(row.comision_100_total) if row.comision_100_total is not None else 0
 
             for cat, lista_tv in groups_map.items():
                 if tv in lista_tv:
                     resultados[cat] += suma_ventas
-                    cat_obj_key = objetivos_map.get(cat)
-
-                    if cat_obj_key in objetivos and objetivos[cat_obj_key] > 0:
-                        objetivo_valor = objetivos[cat_obj_key]
-                        logro_porcentaje = ((suma_ventas / objetivo_valor) * 100 if objetivo_valor > 0 else 0)
-                        logro_porcentaje = round(logro_porcentaje, 2)
-                        comision_75 = float(comision_75) if comision_75 is not None else 0
-                        comision_100 = float(comision_100) if comision_100 is not None else 0
-
-                        if logro_porcentaje >= 100 and comision_100 > 0:
-                            comisiones[cat] = comision_100
-                        elif logro_porcentaje >= 75 and comision_75 > 0:
-                            comisiones[cat] = comision_75
+                    # Acumular comisiones de todos los tipos de venta en el grupo
+                    comisiones[cat] += comision_100 if comision_100 > 0 else comision_75
                     break                
 
         logro = {}
